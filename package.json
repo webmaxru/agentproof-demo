@@ -27,7 +27,7 @@
     "agentproof": "node packages/evidence-cli/dist/cli.js"
   },
   "dependencies": {
-    "fastify": "5.8.4"
+    "fastify": "5.12.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
