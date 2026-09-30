@@ -73,15 +73,22 @@ async function capture(prNumber) {
     "Gate is not a completed evidence result.",
   );
   assert(check.head_sha === headSha, "Check does not describe the current head.");
-  const runMatch =
-    /^https:\/\/github\.com\/webmaxru\/agentproof-demo\/actions\/runs\/([1-9]\d*)$/u.exec(
-      check.details_url,
-    );
-  assert(runMatch, "Check is not linked to this repository's publisher workflow.");
-  const runId = runMatch[1];
+  const publisherLinks = [
+    ...(check.output?.summary ?? "").matchAll(
+      /^\[Workflow run\]\((https:\/\/github\.com\/webmaxru\/agentproof-demo\/actions\/runs\/([1-9]\d*))\)$/gmu,
+    ),
+  ];
+  assert(publisherLinks.length === 1, "Expected one unambiguous publisher link in the check.");
+  const [, workflowRunUrl, runId] = publisherLinks[0];
+  assert(
+    check.details_url === workflowRunUrl ||
+      check.details_url === `https://github.com/${repository}/runs/${check.id}`,
+    "Check is not linked to this repository's publisher workflow or native check page.",
+  );
   const run = api(`${prefix}/actions/runs/${runId}`);
   assert(
     run.repository?.full_name.toLowerCase() === repository.toLowerCase() &&
+      run.html_url === workflowRunUrl &&
       run.name === "AgentProof Publish" &&
       run.event === "workflow_run" &&
       run.path === ".github/workflows/agentproof-publish.yml" &&
@@ -114,7 +121,7 @@ async function capture(prNumber) {
   );
   const trustedChanges = spawnSync(
     "git",
-    ["status", "--porcelain", "--", "packages/evidence-core", "policy", ".github/scripts"],
+    ["status", "--porcelain", "--", ".", ":(exclude)hackathon-2026/assets/recording-kit"],
     {
       cwd: root,
       encoding: "utf8",
@@ -123,7 +130,7 @@ async function capture(prNumber) {
   );
   assert(
     trustedChanges.status === 0 && trustedChanges.stdout.trim() === "",
-    "Trusted evaluator, policy, or script sources are modified. Use the reviewed base checkout.",
+    "The base checkout has changes outside the reviewed recording kit. Use a clean base checkout.",
   );
   await access(corePath).catch(() => {
     throw new Error(
@@ -154,7 +161,7 @@ async function capture(prNumber) {
     "Final evidence subject mismatch.",
   );
   assert(
-    evidence.artifact.workflowRunUrl === check.details_url,
+    evidence.artifact.workflowRunUrl === workflowRunUrl,
     "Evidence names another workflow run.",
   );
   assert(
@@ -216,7 +223,7 @@ async function capture(prNumber) {
     baseSha,
     headSha,
     checkUrl: check.html_url,
-    workflowRunUrl: check.details_url,
+    workflowRunUrl,
     artifactName,
     artifactId: artifact.id,
     githubArchiveDigest: artifact.digest ?? null,

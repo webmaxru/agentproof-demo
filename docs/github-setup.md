@@ -290,11 +290,140 @@ receipt is also preserved in
 
 ### PR evidence
 
-Unsafe, separate remediation, and harmless setup PR receipts will be added
-after their actual workflows complete. No PR gate result, canonical evidence
-digest, human exception, independent approval, or merge is inferred from
-baseline CI. A failed publisher workflow can be the expected reflection of a
-valid blocking gate; an operational failure is a different result.
+These are actual GitHub results observed on `2026-09-30`, not fixture output.
+Every subject below has the same frozen base and policy identity recorded above.
+The unsafe and remediation heads remain fixed. The setup row deliberately
+records its **initial** positive-path head: later documentation/capture-helper
+updates receive fresh checks, with the current-head receipt recorded in
+[readiness issue #2](https://github.com/webmaxru/agentproof-demo/issues/2) rather
+than embedding a self-referential commit SHA in this file.
+
+| Subject                       | PR                                                       | Full head SHA                              |
+| ----------------------------- | -------------------------------------------------------- | ------------------------------------------ |
+| Initial harmless setup        | [#4](https://github.com/webmaxru/agentproof-demo/pull/4) | `dea6d65ead787e0c1bc3fdf210230d2a9f619ddf` |
+| Frozen unsafe recording       | [#5](https://github.com/webmaxru/agentproof-demo/pull/5) | `e445241ec7a8cd913eeb50b0798c03d46816b629` |
+| Separate prepared remediation | [#6](https://github.com/webmaxru/agentproof-demo/pull/6) | `830d2589cee7ab9b2db4b3afa1c93f25ca2b6c73` |
+
+| Subject       | CI: Build, lint, and test                                                                    | Analysis                                                                                     | Publisher                                                                                             | AgentProof / gate                  |
+| ------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| Initial setup | [36789738759](https://github.com/webmaxru/agentproof-demo/actions/runs/36789738759): success | [36789738878](https://github.com/webmaxru/agentproof-demo/actions/runs/36789738878): success | [36789784985](https://github.com/webmaxru/agentproof-demo/actions/runs/36789784985): success          | success; 6 pass                    |
+| Unsafe        | [36789830299](https://github.com/webmaxru/agentproof-demo/actions/runs/36789830299): success | [36789830447](https://github.com/webmaxru/agentproof-demo/actions/runs/36789830447): success | [36789882094](https://github.com/webmaxru/agentproof-demo/actions/runs/36789882094): expected failure | failure; 3 pass, 2 fail, 1 unknown |
+| Remediation   | [36791206333](https://github.com/webmaxru/agentproof-demo/actions/runs/36791206333): success | [36791206260](https://github.com/webmaxru/agentproof-demo/actions/runs/36791206260): success | [36791264418](https://github.com/webmaxru/agentproof-demo/actions/runs/36791264418): expected failure | failure; 5 pass, 1 unknown         |
+
+The blocking publishers passed provenance, metadata, evaluation, artifact
+upload, and check publication. Their only failing step was
+`Reflect a blocking gate in workflow status`. This is a valid blocking result,
+not an infrastructure failure or a passing workflow.
+
+The unsafe artifact contains exactly these unresolved findings:
+
+- `AP-SEC-NPM-AUDIT-001`: **fail**, actual audit exit 1, one high and one
+  moderate dependency finding with Fastify 5.8.4.
+- `AP-TEST-AUTHORIZATION-001`: **fail**, required AP-ID absent. All seven
+  behavioral tests still passed; neither the authorization assertions nor the
+  application behavior was removed.
+- `AP-POL-RETENTION-001`: **unknown**, only `deletionMethod` is missing.
+
+Remediation is a direct child of the frozen unsafe commit, targeting `main`.
+Its manifest, lockfile, runtime source, and complete tests match the safe
+baseline exactly. Its only diff against `main` is the missing `deletionMethod`.
+Dependency and AP-ID findings therefore pass in real evidence, but retention
+remains **unknown** and blocking. No exception was accepted to create either
+result.
+
+#### Immutable artifact receipts
+
+All three final documents have schema `1.0.0`, self-declared `GitHub Copilot`
+origin, no diagnostics, no dispositions, and no advisory reviewer fragments.
+The current native comment lists contained only the owned GitHub Actions gate
+summaries; the native review lists were empty. Each `validUntil` is `null`
+because there is no accepted-exception expiry; this is not perpetual freshness
+or approval. Revalidate the current head, base, comments, checks, and artifacts
+immediately before recording.
+
+| Subject       | Native check ID (GitHub Actions app `15368`) | Artifact ID   | Generated / evaluated at   |
+| ------------- | -------------------------------------------- | ------------- | -------------------------- |
+| Initial setup | `110139921538`                               | `11131656319` | `2026-09-30T23:12:21.167Z` |
+| Unsafe        | `110140197835`                               | `11131196484` | `2026-09-30T23:13:17.345Z` |
+| Remediation   | `110144629433`                               | `11131634272` | `2026-09-30T23:29:02.573Z` |
+
+Artifact names are exactly
+`agentproof-evidence-pr-<PR_NUMBER>-<FULL_HEAD_SHA>`, using the identities above.
+Canonical JSON evidence digests were verified with `parseAndVerifyEvidence`
+from the built baseline core, independently of the archive digest reported by
+GitHub:
+
+| Subject       | Verified canonical evidence SHA-256                                | GitHub-reported archive digest                                            |
+| ------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| Initial setup | `a092ec9ea120efeb065d82754a10752636cca13909388e6429a61ecb3d1b8f0a` | `sha256:070787b964528ef767c33c61c89fa5555ba165272be509b97911de54dc24a2f4` |
+| Unsafe        | `c43901afa2ae62b02ad80b44c1abd35b20253fee4cecfd495c6f3e317c0313a9` | `sha256:dbfebec19dd38057630d54d95c555216cc0e415bf1ead3d2cad31112249b3c82` |
+| Remediation   | `d91686a70abb9011ae8e7daed2e89ed3d0f9db6581f9a60f8ddeecf6eecec339` | `sha256:3acb77a69afd286d601a027281f9b9a2293a663b64e894262975e3f41c1a7175` |
+
+These are different digest types; neither a raw-file hash nor the ZIP digest
+was substituted for the canonical evidence digest. Verification checked the
+exact repository/PR/base/head, policy path/version/digest, all finding SHAs,
+gate counts/blockers, native check app/conclusion/digest, workflow path/event/
+conclusion, artifact identity, and unchanged live PR identity before and after.
+
+Selected exact read-only commands and results, after the authentication
+preamble, from the reference repository root:
+
+```powershell
+# Passed: native current-head checks and the expected publisher failure step.
+gh api repos/webmaxru/agentproof-demo/commits/e445241ec7a8cd913eeb50b0798c03d46816b629/check-runs
+gh api repos/webmaxru/agentproof-demo/actions/runs/36789882094/jobs
+gh api repos/webmaxru/agentproof-demo/actions/runs/36791264418/jobs
+
+# Passed: exact final artifacts downloaded into ignored local storage.
+gh run download 36789784985 --repo webmaxru/agentproof-demo --name agentproof-evidence-pr-4-dea6d65ead787e0c1bc3fdf210230d2a9f619ddf --dir .agentproof\live-validation\pr-4
+gh run download 36789882094 --repo webmaxru/agentproof-demo --name agentproof-evidence-pr-5-e445241ec7a8cd913eeb50b0798c03d46816b629 --dir .agentproof\live-validation\pr-5
+
+# Passed with the reviewed kit overlay on the clean frozen base:
+# VERIFIED_READ_ONLY_SNAPSHOT_NOT_APPROVAL, 5 pass / 1 unknown.
+node hackathon-2026\assets\recording-kit\capture-state.mjs --pr 6
+```
+
+The unsafe Windows checkout had two disclosed aggregate `npm run check`
+failures at the unchanged 10-second health-test startup hook. Its standalone
+`npm run test:app -- --reporter=verbose` passed 7/7 at default timeouts;
+`npm run build` passed; local coverage passed with the explicitly disclosed
+CLI-only `--hookTimeout=60000`. No test configuration, assertions, thresholds,
+or policy was relaxed. Its real Linux CI subsequently passed the full,
+unchanged-default aggregate command. Remediation's standalone default-timeout
+app suite and build passed without a retry; its actual audit returned exit 0,
+zero high/critical, and one allowed moderate finding.
+
+#### Presenter helper integration finding
+
+The first live safe capture correctly stopped because the original helper
+expected `check.details_url` to be a workflow-run URL. Native GitHub returned
+`https://github.com/webmaxru/agentproof-demo/runs/<CHECK_ID>` instead. The
+reviewed helper now resolves exactly one publisher footer from the authentic
+check summary, verifies the run and artifact independently, and accepts only
+that canonical publisher URL or the exact native check page in `details_url`.
+It never treats a check ID as a workflow-run ID.
+
+Real fixed-helper captures passed for the initial safe, unsafe, and remediation
+subjects. The helper rejects changes outside the reviewed recording-kit
+overlay and still requires the exact live PR base checkout before importing
+the evaluator. Follow the
+[recording-kit overlay procedure](../hackathon-2026/assets/recording-kit/README.md#refresh-presenter-evidence-before-recording)
+while the setup PR is unmerged. This preserves the frozen base rather than
+weakening the identity check or advancing `main`.
+
+#### Remaining human and plan checks
+
+| Check                                                                          | Actual status                                                                                                             |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Ruleset / branch protection and enforced merge behavior                        | **BLOCKED BY PLAN**: private APIs return 403; no enforcement claimed                                                      |
+| Designate a distinct authorized reviewer and obtain independent approval       | **HUMAN NOT PERFORMED**; sole current collaborator is the author                                                          |
+| Submit, edit, delete, or expire a real eligible acceptance                     | **HUMAN NOT PERFORMED**; no exception comments posted                                                                     |
+| Advance the same unsafe PR after recording its first exception                 | **HUMAN NOT PERFORMED**; unsafe head remains frozen, separate remediation is not this demonstration                       |
+| Dismiss an actual prior approval after a head update                           | **HUMAN NOT PERFORMED**; no prior approval was fabricated                                                                 |
+| Live policy-tampering / overlapping-publication acceptance exercise            | **NOT PERFORMED LIVE**; trusted-base paths and automated rejection tests were checked, not represented as live acceptance |
+| Fresh advisory specialists / assembled reviewer fragments                      | **NOT RUN**; no generated notes represented as specialist output                                                          |
+| Upstream kit migration merge and newly installed `main` marketplace validation | **HUMAN NOT PERFORMED**; old installed plugin is not evidence of the new kit                                              |
+| Live footage, narration, final master, and privacy sign-off                    | **HUMAN NOT PERFORMED**; precomputed assets remain labeled                                                                |
 
 Tracking issues:
 

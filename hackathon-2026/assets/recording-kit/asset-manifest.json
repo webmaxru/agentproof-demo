@@ -50,8 +50,8 @@
     },
     {
       "path": "capture-state.mjs",
-      "bytes": 11900,
-      "sha256": "4c5dcd6008e109b7d80e0cb1111a7fce6c06ba9d8b1cfd4eb9b7585d0439eaed"
+      "bytes": 12243,
+      "sha256": "98457b9c63e745ac5516ab94b41a598db3305bf0987547a551eb37faf88a9432"
     },
     {
       "path": "cue-cards/00.png",
@@ -170,8 +170,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6188,
-      "sha256": "f1827df69c8d44ac2c3ddeffcfe5b39a5b834606ce2f2a4f9ee11920eba4ecce"
+      "bytes": 7080,
+      "sha256": "90f57b7e9faff3fbb87408f7e0b8989acb81f5628e9f8edf785d69a5eb012137"
     },
     {
       "path": "slide-previews/Slide1.PNG",

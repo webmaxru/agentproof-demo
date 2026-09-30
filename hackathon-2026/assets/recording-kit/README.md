@@ -51,8 +51,24 @@ The helper uses the saved `webmaxru` GitHub keyring identity, removing inherited
 changes the global login, posts a comment, submits a decision, starts a workflow,
 approves, or merges. It rejects stale/mixed identity, incomplete checks, expired
 artifacts, mismatched canonical digests, and incorrect protected-base policy.
+GitHub can replace a custom check's `details_url` with its native check page.
+The helper therefore reads the single publisher link from the native check's
+summary, then independently verifies that run, its artifact, and the protected
+policy. A native check-page ID is never treated as a workflow-run ID.
 The completed publisher must agree with the native gate: a `failure` is expected
 for genuine blocking evidence and is never relabeled as a passing workflow.
+
+If the reviewed capture fix is still in the unmerged setup PR, use a clean,
+disposable checkout of the live PR base and copy only that reviewed commit's
+recording kit into it. From the repository root, after fetching that commit:
+
+```powershell
+git restore --source "<REVIEWED_KIT_COMMIT_SHA>" --worktree -- .\hackathon-2026\assets\recording-kit
+```
+
+Keep the evaluator, policy, package files, and workflow scripts at the base
+revision. Do not run the capture from the candidate PR head. This local asset
+overlay does not merge the PR, change `main`, or turn the snapshot into approval.
 
 Every successful capture gets a new ignored `.agentproof\recording` directory.
 The downloaded evidence and `presenter-state.json` are a private, read-only
