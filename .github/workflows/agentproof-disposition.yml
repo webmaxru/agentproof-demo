@@ -1,0 +1,58 @@
+name: AgentProof Disposition
+
+on:
+  issue_comment:
+    types:
+      - created
+      - edited
+      - deleted
+  pull_request_target:
+    types:
+      - edited
+      - reopened
+      - ready_for_review
+
+permissions:
+  actions: write
+  checks: write
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: agentproof-gate-pr-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  revalidate:
+    name: Authorize decision and revalidate
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out trusted dispatcher
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Authorize actor and dispatch analysis
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node .github/scripts/authorize-and-dispatch.mjs
+
+  refresh-pull-request:
+    name: Invalidate mutable pull request state
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out trusted dispatcher
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+
+      - name: Invalidate gate and dispatch analysis
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node .github/scripts/revalidate-pull-request.mjs

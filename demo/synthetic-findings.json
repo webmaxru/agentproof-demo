@@ -1,0 +1,146 @@
+{
+  "schemaVersion": "1.0.0",
+  "documentType": "final",
+  "repository": "agentproof/synthetic-demo",
+  "pullRequestNumber": 1,
+  "baseSha": "0000000000000000000000000000000000000000",
+  "headSha": "1111111111111111111111111111111111111111",
+  "generatedAt": "2026-09-02T08:29:23.038Z",
+  "generatorVersion": "0.1.0-precomputed-not-live-synthetic",
+  "origin": {
+    "classification": "self-declared",
+    "declaredTool": "synthetic-fixture-not-live",
+    "source": "pull-request-body"
+  },
+  "policy": {
+    "path": "policy/release-policy.yml",
+    "version": "1.0.0",
+    "baseSha": "0000000000000000000000000000000000000000",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "tools": {
+    "nodeVersion": "v22.23.0",
+    "npmVersion": "11.2.0",
+    "vitestVersion": "3.2.4",
+    "auditDatabaseUpdatedAt": null,
+    "agentproofVersion": "0.1.0"
+  },
+  "findings": [
+    {
+      "id": "AP-TEST-AUTHORIZATION-001",
+      "category": "test",
+      "state": "fail",
+      "severity": "high",
+      "title": "Non-approver authorization test is absent",
+      "summary": "Required test ID \"expense-approval.authorization.non-approver-denied\" is absent.",
+      "evidenceRefs": [
+        {
+          "kind": "test",
+          "name": "Synthetic Vitest report",
+          "path": "tests/expenses.integration.test.ts"
+        }
+      ],
+      "exceptionable": false,
+      "remediationHint": "Restore the required stable authorization test and rerun Vitest.",
+      "collector": "vitest",
+      "sourceSha": "1111111111111111111111111111111111111111",
+      "facts": {
+        "requiredTestId": "expense-approval.authorization.non-approver-denied",
+        "matchCount": 0
+      }
+    },
+    {
+      "id": "AP-SEC-NPM-AUDIT-001",
+      "category": "security",
+      "state": "fail",
+      "severity": "high",
+      "title": "Production dependency audit exceeds policy",
+      "summary": "Direct runtime dependency fastify@5.8.4 is affected by a high-severity advisory.",
+      "evidenceRefs": [
+        {
+          "kind": "advisory",
+          "name": "GHSA-247c-9743-5963",
+          "path": "package.json",
+          "url": "https://github.com/advisories/GHSA-247c-9743-5963",
+          "line": 20
+        }
+      ],
+      "exceptionable": false,
+      "remediationHint": "Upgrade Fastify to 5.8.5 or later and refresh the lockfile.",
+      "collector": "npm-audit",
+      "sourceSha": "1111111111111111111111111111111111111111",
+      "facts": {
+        "total": 1,
+        "highestSeverity": "high",
+        "severityCounts": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 1,
+          "critical": 0
+        },
+        "advisoryIds": ["GHSA-247c-9743-5963"],
+        "directPackages": ["fastify"],
+        "commandExitCode": 1
+      }
+    },
+    {
+      "id": "AP-POL-RETENTION-001",
+      "category": "policy",
+      "state": "unknown",
+      "severity": "moderate",
+      "title": "Data-retention declaration is incomplete",
+      "summary": "Data-retention declaration is missing: deletionMethod.",
+      "evidenceRefs": [
+        {
+          "kind": "file",
+          "name": "Data-retention declaration",
+          "path": "config/data-handling.yml"
+        }
+      ],
+      "exceptionable": true,
+      "remediationHint": "Restore deletionMethod in the synthetic data-retention declaration.",
+      "collector": "data-retention",
+      "sourceSha": "1111111111111111111111111111111111111111",
+      "facts": {
+        "declaration": {
+          "schemaVersion": "1.0.0",
+          "classification": "synthetic",
+          "retentionDays": 7,
+          "owner": "agentproof-sample-maintainers",
+          "dataCategories": ["synthetic-employee-identifiers", "synthetic-expense-records"],
+          "storageMedium": "process-memory",
+          "persistence": "none",
+          "deletionTrigger": "process-exit-or-seven-days-whichever-occurs-first",
+          "externalSharing": "prohibited",
+          "purpose": "demonstrate-expense-approval-evidence-checks"
+        },
+        "missingFields": ["deletionMethod"],
+        "schemaVersionValid": true
+      }
+    }
+  ],
+  "diagnostics": [],
+  "dispositions": [],
+  "reviewerNotes": [],
+  "gate": {
+    "conclusion": "failure",
+    "unresolvedFindingIds": [
+      "AP-TEST-AUTHORIZATION-001",
+      "AP-SEC-NPM-AUDIT-001",
+      "AP-POL-RETENTION-001"
+    ],
+    "counts": {
+      "pass": 0,
+      "fail": 2,
+      "unknown": 1,
+      "exception": 0
+    },
+    "evaluatedAt": "2026-09-02T08:29:23.038Z",
+    "validUntil": null
+  },
+  "artifact": {
+    "sha256": "db7e472d8367b95f9225b50111e81a982866d4b0d3f60e55e04153a8e942abf4",
+    "workflowRunUrl": null
+  }
+}

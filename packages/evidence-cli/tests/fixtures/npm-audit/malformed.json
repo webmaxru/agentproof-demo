@@ -1,0 +1,10 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": [],
+  "metadata": {
+    "vulnerabilities": {
+      "high": "one",
+      "total": 1
+    }
+  }
+}

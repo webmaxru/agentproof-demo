@@ -1,0 +1,32 @@
+{
+  "numTotalTests": 3,
+  "numPassedTests": 3,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "testResults": [
+    {
+      "name": "tests/expenses.test.ts",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["expense API"],
+          "title": "creates a synthetic expense",
+          "fullName": "expense API creates a synthetic expense",
+          "status": "passed"
+        },
+        {
+          "ancestorTitles": ["expense API"],
+          "title": "allows an approver",
+          "fullName": "expense API allows an approver",
+          "status": "passed"
+        },
+        {
+          "ancestorTitles": ["expense API", "authorization"],
+          "title": "denies a non-approver",
+          "fullName": "expense API authorization denies a non-approver [AP-ID:expense-approval.authorization.non-approver-denied]",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

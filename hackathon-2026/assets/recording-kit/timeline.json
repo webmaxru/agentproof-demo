@@ -1,0 +1,92 @@
+[
+  {
+    "start": 0,
+    "end": 14,
+    "title": "The exact change matters",
+    "lowerThird": "AI-ASSISTED CHANGE - CURRENT HEAD SHA",
+    "picture": "Unsafe PR, full current SHA, origin declaration, red AgentProof / gate.",
+    "voiceover": "AI can help build software quickly. The release question is different: did this exact change earn evidence and an accountable decision?",
+    "humanAction": "Open the prepared unsafe PR. Do not show tokens or unrelated browser chrome."
+  },
+  {
+    "start": 14,
+    "end": 31,
+    "title": "Deterministic evidence",
+    "lowerThird": "READ-ONLY SPECIALISTS - SAME SHA",
+    "picture": "Real check and artifact, then permitted same-SHA specialist results.",
+    "voiceover": "AgentProof runs deterministic collectors without secrets and binds the result to the pull-request head SHA. Read-only specialist sessions add context for tests, security, and policy, but they remain advisory.",
+    "humanAction": "Omit unavailable reviewer footage; never substitute invented reviewer output."
+  },
+  {
+    "start": 31,
+    "end": 51,
+    "title": "A board, not an approval",
+    "lowerThird": "MUTABLE COORDINATION - GITHUB IS AUTHORITATIVE",
+    "picture": "Evidence Board: dependency fail, required-test fail, retention unknown.",
+    "voiceover": "The assembler rejects mixed repositories, policies, or SHAs. The board helps people coordinate, but it is mutable. The GitHub check, artifact, comments, reviews, and commit remain the authoritative record.",
+    "humanAction": "Load only validated evidence. Keep the authority banner visible."
+  },
+  {
+    "start": 51,
+    "end": 69,
+    "title": "An explicit human decision",
+    "lowerThird": "HUMAN DISPOSITION - ELIGIBLE, EXPLICIT, EXPIRING",
+    "picture": "Eligible retention finding and an unsubmitted current-SHA exception command.",
+    "voiceover": "A release manager may accept only a policy-eligible finding, with a specific reason and an expiry. This is not an approval, and it does not excuse the non-exceptionable failures.",
+    "humanAction": "Only the authorized human may verify and submit the decision."
+  },
+  {
+    "start": 69,
+    "end": 93,
+    "title": "Remediation creates a new SHA",
+    "lowerThird": "REMEDIATION COMMIT - NEW HEAD SHA",
+    "picture": "Real dependency upgrade and restored authorization-test marker, then new commit.",
+    "voiceover": "The preferred path is remediation. The dependency is upgraded and the authorization test is restored. The push creates a new head SHA, so this is now a new release decision.",
+    "humanAction": "Advance the recording PR only after capturing the unsafe-head decision."
+  },
+  {
+    "start": 93,
+    "end": 111,
+    "title": "Old decisions do not travel",
+    "lowerThird": "NEW SHA - PRIOR EVIDENCE AND APPROVAL STALE",
+    "picture": "Different full head SHAs; stale disposition and fresh workflow activity.",
+    "voiceover": "The old exception, evidence, and approval cannot travel across a commit change. AgentProof fails closed until the new revision earns fresh evidence.",
+    "humanAction": "Show stale approval only if a real prior human approval existed and was dismissed."
+  },
+  {
+    "start": 111,
+    "end": 132,
+    "title": "Fresh evidence, same new SHA",
+    "lowerThird": "FRESH SAME-SHA EVIDENCE",
+    "picture": "New-PR-head check, artifact, policy and digest; fresh notes only if available.",
+    "voiceover": "Fresh collectors and fresh specialist notes now describe the remediated commit. Any remaining exception is recorded again against this SHA, never copied from the previous revision.",
+    "humanAction": "A human submits any still-needed exception against the new full head SHA."
+  },
+  {
+    "start": 132,
+    "end": 152,
+    "title": "Evidence plus independent review",
+    "lowerThird": "GREEN GATE + INDEPENDENT REVIEW",
+    "picture": "Actual green gate and artifact, then a distinct human's approval.",
+    "voiceover": "The gate turns green only when the current evidence, policy, disposition, and artifact digest agree. A different human still reviews the change. Evidence alone cannot approve, and approval alone cannot bypass a red gate.",
+    "humanAction": "Requires enforced repository protections. Show merge available, but never merge."
+  },
+  {
+    "start": 152,
+    "end": 163,
+    "title": "Bounded evidence",
+    "lowerThird": "BOUNDED TO REPOSITORY + POLICY + SHA",
+    "picture": "Limits frame: bounded evidence, no universal provenance, no automatic approval.",
+    "voiceover": "This is bounded evidence for one repository, policy, and commit. It does not prove universal authorship, legal compliance, or production suitability.",
+    "humanAction": "Use limits slide 3. Do not imply production or legal certification."
+  },
+  {
+    "start": 163,
+    "end": 174,
+    "title": "Stop at the permission boundary",
+    "lowerThird": "PERMISSION CANARY - DO NOT RE-ENABLE",
+    "picture": "Actual disabled canary with UNSAFE_TOOL_BOUNDARY.\nOtherwise show a labeled limitation card.",
+    "voiceover": "We tested the automation boundary too. Mutation tools remained visible, so AgentProof stopped before using them and the trigger was disabled. Refusing an unsafe runtime is part of the product.",
+    "humanAction": "Use this wording only with an actual retained result and verified disabled state."
+  }
+]

@@ -1,0 +1,13 @@
+take:
+unsafe_head_sha:
+remediated_head_sha:
+pr_number:
+final_artifact_digest:
+workflow_run_urls:
+reviewer_session_labels:
+exception_finding_id:
+exception_expiry:
+independent_reviewer:
+fallback_segments:
+privacy_reviewed_by:
+reviewed_at:

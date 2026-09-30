@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "documentType": "review-fragment",
+  "repository": "agentproof/example",
+  "pullRequestNumber": 7,
+  "baseSha": "1111111111111111111111111111111111111111",
+  "headSha": "3333333333333333333333333333333333333333",
+  "policySha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "evidenceArtifactSha256": "c63b1e3c39c09aa7cb190299fe4e475f74627099063d43135efa8f133a2f57bf",
+  "reviewerNote": {
+    "specialist": "policy",
+    "sessionUrl": "https://github.com/copilot/agents/session/fixture",
+    "sourceSha": "3333333333333333333333333333333333333333",
+    "summary": "This otherwise valid fragment belongs to another head SHA.",
+    "findingIds": ["AP-POL-FIXTURE-001"],
+    "createdAt": "2026-09-02T08:40:00.000Z"
+  },
+  "artifact": {
+    "sha256": "bc4bb9f89c1e12c0c0fe07ad36d6d88ba8dca7f35c81d5e9ee4033dcec5a641c",
+    "workflowRunUrl": null
+  }
+}

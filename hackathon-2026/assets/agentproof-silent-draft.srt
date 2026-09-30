@@ -1,0 +1,39 @@
+1
+00:00:00,000 --> 00:00:14,000
+AI-assisted change - current head SHA
+
+2
+00:00:14,000 --> 00:00:31,000
+Deterministic evidence - read-only specialists - same SHA
+
+3
+00:00:31,000 --> 00:00:51,000
+Mutable coordination view - GitHub is authoritative
+
+4
+00:00:51,000 --> 00:01:09,000
+Human disposition - eligible, explicit, expiring
+
+5
+00:01:09,000 --> 00:01:33,000
+Remediation commit - new head SHA
+
+6
+00:01:33,000 --> 00:01:51,000
+New SHA - prior evidence and approval stale
+
+7
+00:01:51,000 --> 00:02:12,000
+Fresh same-SHA evidence
+
+8
+00:02:12,000 --> 00:02:32,000
+Green gate plus independent review
+
+9
+00:02:32,000 --> 00:02:43,000
+Bounded to repository, policy, and SHA
+
+10
+00:02:43,000 --> 00:02:54,000
+Permission canary disabled - UNSAFE_TOOL_BOUNDARY

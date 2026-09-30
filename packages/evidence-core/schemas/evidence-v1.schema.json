@@ -1,0 +1,557 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentproof.dev/schemas/evidence-v1.schema.json",
+  "title": "AgentProof evidence contract v1",
+  "description": "Versioned raw evidence, final evidence, and reviewer fragment documents.",
+  "$comment": "artifact.sha256 is SHA-256 of RFC-style canonical JSON after replacing artifact.sha256 with 64 zeroes.",
+  "oneOf": [
+    { "$ref": "#/$defs/rawEvidence" },
+    { "$ref": "#/$defs/finalEvidence" },
+    { "$ref": "#/$defs/reviewFragment" }
+  ],
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "findingId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 80,
+      "pattern": "^AP-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "severity": {
+      "enum": ["info", "low", "moderate", "high", "critical"]
+    },
+    "findingState": {
+      "enum": ["pass", "fail", "unknown", "exception"]
+    },
+    "jsonValue": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string", "maxLength": 1000 },
+        {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/jsonValue" }
+        },
+        {
+          "type": "object",
+          "maxProperties": 100,
+          "propertyNames": { "minLength": 1, "maxLength": 80 },
+          "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+        }
+      ]
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "file",
+            "test",
+            "coverage",
+            "advisory",
+            "command",
+            "pull-request",
+            "policy",
+            "workflow"
+          ]
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 500,
+          "pattern": "^https?://"
+        },
+        "line": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "category",
+        "state",
+        "severity",
+        "title",
+        "summary",
+        "evidenceRefs",
+        "exceptionable",
+        "remediationHint",
+        "collector",
+        "sourceSha",
+        "facts"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/findingId" },
+        "category": {
+          "enum": ["test", "security", "policy", "provenance"]
+        },
+        "state": { "$ref": "#/$defs/findingState" },
+        "severity": { "$ref": "#/$defs/severity" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "evidenceRefs": {
+          "type": "array",
+          "maxItems": 50,
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        },
+        "exceptionable": { "type": "boolean" },
+        "remediationHint": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "collector": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "sourceSha": { "$ref": "#/$defs/sha" },
+        "facts": {
+          "type": "object",
+          "maxProperties": 50,
+          "propertyNames": {
+            "pattern": "^[A-Za-z][A-Za-z0-9]*$",
+            "maxLength": 80
+          },
+          "additionalProperties": { "$ref": "#/$defs/jsonValue" }
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "declaredTool", "source"],
+      "properties": {
+        "classification": {
+          "enum": ["github-attributed", "self-declared", "unknown"]
+        },
+        "declaredTool": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "source": { "enum": ["github", "pull-request-body", "none"] }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeVersion",
+        "npmVersion",
+        "vitestVersion",
+        "auditDatabaseUpdatedAt",
+        "agentproofVersion"
+      ],
+      "properties": {
+        "nodeVersion": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "npmVersion": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "vitestVersion": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "auditDatabaseUpdatedAt": {
+          "oneOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }]
+        },
+        "agentproofVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collector", "level", "code", "message"],
+      "properties": {
+        "collector": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[a-z0-9-]+$"
+        },
+        "level": { "enum": ["warning", "error"] },
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^AP_[A-Z0-9_]+$"
+        },
+        "message": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "reviewerNoteInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["specialist", "sessionUrl", "sourceSha", "summary", "findingIds", "createdAt"],
+      "properties": {
+        "specialist": { "enum": ["test", "security", "policy", "evidence"] },
+        "sessionUrl": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 500,
+          "pattern": "^https?://"
+        },
+        "sourceSha": { "$ref": "#/$defs/sha" },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "findingIds": {
+          "type": "array",
+          "maxItems": 50,
+          "items": { "$ref": "#/$defs/findingId" }
+        },
+        "createdAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "reviewerNote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specialist",
+        "sessionUrl",
+        "sourceSha",
+        "summary",
+        "findingIds",
+        "createdAt",
+        "fragmentSha256"
+      ],
+      "properties": {
+        "specialist": { "enum": ["test", "security", "policy", "evidence"] },
+        "sessionUrl": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 500,
+          "pattern": "^https?://"
+        },
+        "sourceSha": { "$ref": "#/$defs/sha" },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "findingIds": {
+          "type": "array",
+          "maxItems": 50,
+          "items": { "$ref": "#/$defs/findingId" }
+        },
+        "createdAt": { "$ref": "#/$defs/timestamp" },
+        "fragmentSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "workflowRunUrl"],
+      "properties": {
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "workflowRunUrl": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "maxLength": 500,
+          "pattern": "^https?://"
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "documentType",
+        "repository",
+        "pullRequestNumber",
+        "baseSha",
+        "headSha"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" },
+        "documentType": {
+          "enum": ["raw", "final", "review-fragment"]
+        },
+        "repository": { "$ref": "#/$defs/repository" },
+        "pullRequestNumber": { "type": "integer", "minimum": 1 },
+        "baseSha": { "$ref": "#/$defs/sha" },
+        "headSha": { "$ref": "#/$defs/sha" }
+      }
+    },
+    "rawEvidence": {
+      "allOf": [
+        { "$ref": "#/$defs/identity" },
+        {
+          "type": "object",
+          "required": [
+            "generatedAt",
+            "generatorVersion",
+            "origin",
+            "tools",
+            "findings",
+            "diagnostics",
+            "reviewerNotes",
+            "artifact"
+          ],
+          "properties": {
+            "documentType": { "const": "raw" },
+            "generatedAt": { "$ref": "#/$defs/timestamp" },
+            "generatorVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "origin": { "$ref": "#/$defs/origin" },
+            "tools": { "$ref": "#/$defs/tools" },
+            "findings": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 500,
+              "items": { "$ref": "#/$defs/finding" }
+            },
+            "diagnostics": {
+              "type": "array",
+              "maxItems": 100,
+              "items": { "$ref": "#/$defs/diagnostic" }
+            },
+            "reviewerNotes": {
+              "type": "array",
+              "maxItems": 100,
+              "items": { "$ref": "#/$defs/reviewerNote" }
+            },
+            "artifact": { "$ref": "#/$defs/artifact" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "policyDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "version", "baseSha", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$"
+        },
+        "version": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "baseSha": { "$ref": "#/$defs/sha" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "findingId",
+        "decision",
+        "actor",
+        "actorPermission",
+        "commentId",
+        "commentUrl",
+        "bodySha256",
+        "rationale",
+        "expires",
+        "recordedAt",
+        "boundHeadSha",
+        "status",
+        "effective",
+        "errors"
+      ],
+      "properties": {
+        "findingId": {
+          "oneOf": [{ "$ref": "#/$defs/findingId" }, { "type": "null" }]
+        },
+        "decision": {
+          "enum": ["accept-exception", "request-remediation", "reject", "invalid"]
+        },
+        "actor": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "actorPermission": {
+          "enum": ["none", "read", "triage", "write", "maintain", "admin"]
+        },
+        "commentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40,
+          "pattern": "^[1-9]\\d*$"
+        },
+        "commentUrl": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 500,
+          "pattern": "^https?://"
+        },
+        "bodySha256": { "$ref": "#/$defs/sha256" },
+        "rationale": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "expires": {
+          "oneOf": [{ "$ref": "#/$defs/date" }, { "type": "null" }]
+        },
+        "recordedAt": { "$ref": "#/$defs/timestamp" },
+        "boundHeadSha": {
+          "oneOf": [{ "$ref": "#/$defs/sha" }, { "type": "null" }]
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "remediation-requested",
+            "rejected",
+            "superseded",
+            "malformed",
+            "stale",
+            "expired",
+            "unauthorized",
+            "ineligible",
+            "edited-away",
+            "deleted"
+          ]
+        },
+        "effective": { "type": "boolean" },
+        "errors": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "type": "string", "minLength": 1, "maxLength": 300 }
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conclusion", "unresolvedFindingIds", "counts", "evaluatedAt", "validUntil"],
+      "properties": {
+        "conclusion": { "enum": ["success", "failure"] },
+        "unresolvedFindingIds": {
+          "type": "array",
+          "maxItems": 500,
+          "items": { "$ref": "#/$defs/findingId" }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pass", "fail", "unknown", "exception"],
+          "properties": {
+            "pass": { "type": "integer", "minimum": 0 },
+            "fail": { "type": "integer", "minimum": 0 },
+            "unknown": { "type": "integer", "minimum": 0 },
+            "exception": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "evaluatedAt": { "$ref": "#/$defs/timestamp" },
+        "validUntil": {
+          "oneOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }]
+        }
+      }
+    },
+    "finalEvidence": {
+      "allOf": [
+        { "$ref": "#/$defs/identity" },
+        {
+          "type": "object",
+          "required": [
+            "generatedAt",
+            "generatorVersion",
+            "origin",
+            "policy",
+            "tools",
+            "findings",
+            "diagnostics",
+            "dispositions",
+            "reviewerNotes",
+            "gate",
+            "artifact"
+          ],
+          "properties": {
+            "documentType": { "const": "final" },
+            "generatedAt": { "$ref": "#/$defs/timestamp" },
+            "generatorVersion": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "origin": { "$ref": "#/$defs/origin" },
+            "policy": { "$ref": "#/$defs/policyDescriptor" },
+            "tools": { "$ref": "#/$defs/tools" },
+            "findings": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 500,
+              "items": { "$ref": "#/$defs/finding" }
+            },
+            "diagnostics": {
+              "type": "array",
+              "maxItems": 100,
+              "items": { "$ref": "#/$defs/diagnostic" }
+            },
+            "dispositions": {
+              "type": "array",
+              "maxItems": 1000,
+              "items": { "$ref": "#/$defs/disposition" }
+            },
+            "reviewerNotes": {
+              "type": "array",
+              "maxItems": 100,
+              "items": { "$ref": "#/$defs/reviewerNote" }
+            },
+            "gate": { "$ref": "#/$defs/gate" },
+            "artifact": { "$ref": "#/$defs/artifact" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "reviewFragment": {
+      "allOf": [
+        { "$ref": "#/$defs/identity" },
+        {
+          "type": "object",
+          "required": ["policySha256", "evidenceArtifactSha256", "reviewerNote", "artifact"],
+          "properties": {
+            "documentType": { "const": "review-fragment" },
+            "policySha256": { "$ref": "#/$defs/sha256" },
+            "evidenceArtifactSha256": { "$ref": "#/$defs/sha256" },
+            "reviewerNote": { "$ref": "#/$defs/reviewerNoteInput" },
+            "artifact": { "$ref": "#/$defs/artifact" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

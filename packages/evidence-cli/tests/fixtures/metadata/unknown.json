@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "repository": "agentproof/example",
+  "pullRequestNumber": 7,
+  "baseSha": "1111111111111111111111111111111111111111",
+  "headSha": "2222222222222222222222222222222222222222",
+  "generatedAt": "2026-09-02T08:00:00.000Z",
+  "workflowRunUrl": "https://github.com/agentproof/example/actions/runs/4",
+  "origin": {
+    "pullRequestBody": "<!-- agentproof-origin:start -->\ntool: Claude Code\n<!-- agentproof-origin:end -->",
+    "githubAttribution": null
+  },
+  "tools": {
+    "npmVersion": "11.5.0",
+    "vitestVersion": "3.2.4",
+    "auditDatabaseUpdatedAt": null
+  },
+  "sources": {
+    "vitest": {
+      "reportPath": "vitest/green.json",
+      "coveragePath": "coverage/green.json",
+      "command": {
+        "exitCode": 0,
+        "error": null
+      }
+    },
+    "npmAudit": {
+      "reportPath": "npm-audit/clean.json",
+      "command": {
+        "exitCode": 0,
+        "error": null
+      }
+    },
+    "dataRetention": {
+      "declarationPath": "retention/incomplete.yml"
+    }
+  }
+}

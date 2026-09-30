@@ -1,0 +1,24 @@
+{
+  "numTotalTests": 2,
+  "numPassedTests": 2,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "testResults": [
+    {
+      "name": "tests/expenses.test.ts",
+      "assertionResults": [
+        {
+          "title": "creates a synthetic expense",
+          "fullName": "expense API creates a synthetic expense",
+          "status": "passed"
+        },
+        {
+          "title": "allows an approver",
+          "fullName": "expense API allows an approver",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+1
+00:00:00,500 --> 00:00:03,071
+AI can help build software quickly.
+
+2
+00:00:03,071 --> 00:00:05,214
+The release question is different:
+
+3
+00:00:05,214 --> 00:00:09,500
+did this exact change earn evidence and an
+accountable decision?
+
+4
+00:00:14,500 --> 00:00:17,500
+AgentProof runs deterministic collectors
+without secrets and
+
+5
+00:00:17,500 --> 00:00:20,929
+binds the result to the pull-request head SHA.
+
+6
+00:00:20,929 --> 00:00:23,929
+Read-only specialist sessions add context for
+tests,
+
+7
+00:00:23,929 --> 00:00:26,929
+security, and policy, but they remain
+advisory.
+
+8
+00:00:31,500 --> 00:00:34,929
+The assembler rejects mixed repositories,
+policies, or SHAs.
+
+9
+00:00:34,929 --> 00:00:38,786
+The board helps people coordinate, but it is
+mutable.
+
+10
+00:00:38,786 --> 00:00:43,929
+The GitHub check, artifact, comments, reviews,
+and commit remain the authoritative record.
+
+11
+00:00:51,500 --> 00:00:55,357
+A release manager may accept only a
+policy-eligible finding,
+
+12
+00:00:55,357 --> 00:00:58,357
+with a specific reason and an expiry.
+
+13
+00:00:58,357 --> 00:01:03,929
+This is not an approval, and it does not
+excuse the non-exceptionable failures.
+
+14
+00:01:09,500 --> 00:01:11,643
+The preferred path is remediation.
+
+15
+00:01:11,643 --> 00:01:15,929
+The dependency is upgraded and the
+authorization test is restored.
+
+16
+00:01:15,929 --> 00:01:18,929
+The push creates a new head SHA,
+
+17
+00:01:18,929 --> 00:01:22,357
+so this is now a new release decision.
+
+18
+00:01:33,500 --> 00:01:38,643
+The old exception, evidence, and approval
+cannot travel across a commit change.
+
+19
+00:01:38,643 --> 00:01:42,929
+AgentProof fails closed until the new revision
+earns fresh evidence.
+
+20
+00:01:51,500 --> 00:01:56,214
+Fresh collectors and fresh specialist notes
+now describe the remediated commit.
+
+21
+00:01:56,214 --> 00:02:00,071
+Any remaining exception is recorded again
+against this SHA,
+
+22
+00:02:00,071 --> 00:02:02,643
+never copied from the previous revision.
+
+23
+00:02:12,500 --> 00:02:16,357
+The gate turns green only when the current
+evidence,
+
+24
+00:02:16,357 --> 00:02:18,929
+policy, disposition, and artifact digest
+agree.
+
+25
+00:02:18,929 --> 00:02:21,929
+A different human still reviews the change.
+
+26
+00:02:21,929 --> 00:02:27,071
+Evidence alone cannot approve, and approval
+alone cannot bypass a red gate.
+
+27
+00:02:32,500 --> 00:02:36,786
+This is bounded evidence for one repository,
+policy, and commit.
+
+28
+00:02:36,786 --> 00:02:41,500
+It does not prove universal authorship, legal
+compliance, or production suitability.
+
+29
+00:02:43,500 --> 00:02:45,500
+We tested the automation boundary too.
+
+30
+00:02:45,500 --> 00:02:46,833
+Mutation tools remained visible,
+
+31
+00:02:46,833 --> 00:02:50,500
+so AgentProof stopped before using them and
+the trigger was disabled.
+
+32
+00:02:50,500 --> 00:02:53,500
+Refusing an unsafe runtime is part of the
+product.

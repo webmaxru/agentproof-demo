@@ -1,0 +1,35 @@
+diff --git a/package.json b/package.json
+--- a/package.json
++++ b/package.json
+@@ -27,7 +27,7 @@
+     "agentproof": "node packages/evidence-cli/dist/cli.js"
+   },
+   "dependencies": {
+-    "fastify": "5.12.1"
++    "fastify": "5.8.4"
+   },
+   "devDependencies": {
+     "@eslint/js": "^10.0.1",
+diff --git a/tests/expenses.integration.test.ts b/tests/expenses.integration.test.ts
+--- a/tests/expenses.integration.test.ts
++++ b/tests/expenses.integration.test.ts
+@@ -75,7 +75,7 @@ describe("synthetic expense approval API", () => {
+     expect(response.json<{ error: string }>()).toMatchObject({ error: "actor_required" });
+   });
+ 
+-  it("[AP-ID:expense-approval.authorization.non-approver-denied] denies approval to a caller outside the approver allow-list", async () => {
++  it("denies approval to a caller outside the approver allow-list", async () => {
+     await app.inject({ method: "POST", url: "/expenses", payload: SYNTHETIC_EXPENSE });
+ 
+     const response = await app.inject({
+diff --git a/config/data-handling.yml b/config/data-handling.yml
+--- a/config/data-handling.yml
++++ b/config/data-handling.yml
+@@ -1,7 +1,6 @@
+ schemaVersion: 1.0.0
+ classification: synthetic
+ retentionDays: 7
+-deletionMethod: process-memory-release
+ owner: agentproof-sample-maintainers
+ dataCategories:
+   - synthetic-employee-identifiers

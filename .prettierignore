@@ -1,0 +1,8 @@
+node_modules
+coverage
+.impeccable
+packages/*/dist
+dist
+package-lock.json
+hackathon-2026/fallback
+packages/evidence-cli/tests/fixtures/retention/malformed.yml

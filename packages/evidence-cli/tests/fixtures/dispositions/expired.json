@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0.0",
+  "evaluatedAt": "2026-09-02T08:30:00.000Z",
+  "comments": [
+    {
+      "commentId": "103",
+      "commentUrl": "https://github.com/agentproof/example/pull/7#issuecomment-103",
+      "actor": "release-manager",
+      "actorPermission": "maintain",
+      "body": "/agentproof accept-exception AP-POL-RETENTION-001\nsha: 2222222222222222222222222222222222222222\nreason: Synthetic data remains bounded while the declaration is corrected.\nexpires: 2026-09-01",
+      "recordedAt": "2026-08-30T08:20:00.000Z",
+      "sourceState": "active"
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "status": "PRECOMPUTED / NOT LIVE",
+  "purpose": "Recording preparation; no live footage, approval or privacy sign-off",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "durationSeconds": 174,
+  "slideCount": 3,
+  "voiceoverWordCount": 271,
+  "video": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_type": "video",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1"
+      }
+    ],
+    "format": {
+      "duration": "174.000000"
+    }
+  },
+  "files": [
+    {
+      "path": "agentproof-cue-timing-draft.mp4",
+      "bytes": 1813562,
+      "sha256": "ee471cb5d13efe7e12209863145d41b14a7d39e27eba3295536bb8bfa0726e4c"
+    },
+    {
+      "path": "agentproof-privacy-review.template.md",
+      "bytes": 1739,
+      "sha256": "52cf04239de4534a4d74c70a39ad33ca51c796e6a7d4ba646a5f0836fb34601c"
+    },
+    {
+      "path": "agentproof-recording-deck.pptx",
+      "bytes": 40680,
+      "sha256": "549d750db43579011496705152256d4fa1c9b1243c1405cbfc01d71dd224991e"
+    },
+    {
+      "path": "agentproof-shot-log.template.md",
+      "bytes": 2643,
+      "sha256": "18ca1517e79f2114546eda72bfc7e539aae4f6b9f23fc9343e57bf9599e6a3fa"
+    },
+    {
+      "path": "agentproof-voiceover-draft.srt",
+      "bytes": 2876,
+      "sha256": "c545f6028d034353c952b70c3bfe16189b36d2134646935f10f250b4eee2d6cd"
+    },
+    {
+      "path": "capture-state.mjs",
+      "bytes": 11900,
+      "sha256": "4c5dcd6008e109b7d80e0cb1111a7fce6c06ba9d8b1cfd4eb9b7585d0439eaed"
+    },
+    {
+      "path": "cue-cards/00.png",
+      "bytes": 64719,
+      "sha256": "92363b0a8dc8afb53ff99db75be78d957db441235064eb77f94fbf3effb96936"
+    },
+    {
+      "path": "cue-cards/01.png",
+      "bytes": 62457,
+      "sha256": "0b6fed52530e457ca65b28ec0e1d5cc4c1618b6416d48cb8aa951ae58ade8a51"
+    },
+    {
+      "path": "cue-cards/02.png",
+      "bytes": 63133,
+      "sha256": "a76ee25c3ca7892097627d8bc59bfc0815c029afe30388ee36c28419989a27a9"
+    },
+    {
+      "path": "cue-cards/03.png",
+      "bytes": 70102,
+      "sha256": "4aa5b30c51ac8653d7200e897e7fa3fc3fc4af0c175a360d94263da1317dc4f4"
+    },
+    {
+      "path": "cue-cards/04.png",
+      "bytes": 73330,
+      "sha256": "e76aba652652d1293100857c59b8f97b145ee9abec8bdb4c5fec652df6b4c0b5"
+    },
+    {
+      "path": "cue-cards/05.png",
+      "bytes": 67505,
+      "sha256": "34ab0197d0778e1f62f92c987da3346581241166c9f9d1290d693832dd34664f"
+    },
+    {
+      "path": "cue-cards/06.png",
+      "bytes": 70312,
+      "sha256": "2711939f27748214d016ff77098e752b33498490e0cf661cbfd0a706ae4eb382"
+    },
+    {
+      "path": "cue-cards/07.png",
+      "bytes": 65420,
+      "sha256": "c54f73fe21e97587873cd5a459ba43576ea35c941860639b75a43c74592b440b"
+    },
+    {
+      "path": "cue-cards/08.png",
+      "bytes": 63083,
+      "sha256": "3bdb01a09af6c894155e463e722346a959fc7bab13f1c988e0816aa01348392e"
+    },
+    {
+      "path": "cue-cards/09.png",
+      "bytes": 80404,
+      "sha256": "41140c63e6ebed28f05a669d134b4c1874ea9cfabad1e78d2127da32134d2771"
+    },
+    {
+      "path": "cue-cards.ffconcat",
+      "bytes": 405,
+      "sha256": "54b498c52acf0acde88de87f3b5d4f56503c640127451164d4ee568deeaac34f"
+    },
+    {
+      "path": "generate_assets.py",
+      "bytes": 23026,
+      "sha256": "23a4da9b71edbe45bafa83795c9566726d1b938e4babf164f7aea073b2a753b5"
+    },
+    {
+      "path": "overlays/00-lower-third.png",
+      "bytes": 15094,
+      "sha256": "862d83ceca3df48eb162c70a02b65872455de670f2d20e3f88d3d26d145d8031"
+    },
+    {
+      "path": "overlays/01-lower-third.png",
+      "bytes": 16277,
+      "sha256": "35c81376b9bcd99c22bb08687e19a03f2d3b27ffe7e0495eb92d64ff8b69bf68"
+    },
+    {
+      "path": "overlays/02-lower-third.png",
+      "bytes": 17974,
+      "sha256": "d950d31425a711b9c9a520c68d66a0fcfd905c5165242f705a36f6535d00d63b"
+    },
+    {
+      "path": "overlays/03-lower-third.png",
+      "bytes": 18577,
+      "sha256": "18cea043439dd802ec2d5fd58820d783e5a9eae86e914ad1082fa246eca6d305"
+    },
+    {
+      "path": "overlays/04-lower-third.png",
+      "bytes": 16444,
+      "sha256": "530e57f97523a1244a39a4010f1019f8cc6e5bf3778a3946198f7f8e3d377f8d"
+    },
+    {
+      "path": "overlays/05-lower-third.png",
+      "bytes": 17329,
+      "sha256": "a489f93cb0899c5654732ea47794af0cfa65879c4bd23bf31537d56945ceb740"
+    },
+    {
+      "path": "overlays/06-lower-third.png",
+      "bytes": 14674,
+      "sha256": "5c5083686ae1dde00810a8ba58d3f6f5dacaaf1512e5b204bcc972bb758d726c"
+    },
+    {
+      "path": "overlays/07-lower-third.png",
+      "bytes": 15015,
+      "sha256": "040ea0188e1b1b56bfa4529b988a66163047a6159e69123cf3e9d7c9ce84149f"
+    },
+    {
+      "path": "overlays/08-lower-third.png",
+      "bytes": 16666,
+      "sha256": "1f6da733c4502b37d927363237c0270a354d2f92c715d974360589afda8a31ed"
+    },
+    {
+      "path": "overlays/09-lower-third.png",
+      "bytes": 16936,
+      "sha256": "1721aa8819d4fcf050f862fc1568cb9cc8c7a227ffb444f0fc88ca05df35f918"
+    },
+    {
+      "path": "overlays/precomputed-not-live.png",
+      "bytes": 15260,
+      "sha256": "03962bb4ffbac47f8c331e694a59e54089393c23cf686e04dd22273080288093"
+    },
+    {
+      "path": "README.md",
+      "bytes": 6188,
+      "sha256": "f1827df69c8d44ac2c3ddeffcfe5b39a5b834606ce2f2a4f9ee11920eba4ecce"
+    },
+    {
+      "path": "slide-previews/Slide1.PNG",
+      "bytes": 83879,
+      "sha256": "e216d12a503887aba5201ee16a3ad9cb5d9a458df9f5bb90234ffc3058d814dd"
+    },
+    {
+      "path": "slide-previews/Slide2.PNG",
+      "bytes": 92004,
+      "sha256": "2e86a68844438906ed0eb9cbee7f0cc93fbc7c95d61bfb2075e7810b1b4a8244"
+    },
+    {
+      "path": "slide-previews/Slide3.PNG",
+      "bytes": 92091,
+      "sha256": "31d62550f54ab10a7476cd9ef051ffa67886e19d85dc653ce5b1dbf5dc629e0b"
+    },
+    {
+      "path": "timeline.json",
+      "bytes": 5327,
+      "sha256": "4ca0e152cf80b477c0cd300b18201e90d04c662bc0aafb3cce32c1790b9ede39"
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentproof.dev/schemas/analyze-metadata-v1.schema.json",
+  "title": "AgentProof analyze metadata v1",
+  "description": "Strict workflow metadata or pre-generated collector report metadata.",
+  "oneOf": [{ "$ref": "#/$defs/workflowMetadata" }, { "$ref": "#/$defs/reportMetadata" }],
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{40}$"
+    },
+    "repository": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300,
+      "pattern": "^(?![\\\\/])(?![A-Za-z]:)(?!.*\\u0000)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$"
+    },
+    "httpUrl": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 500,
+      "pattern": "^https?://"
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exitCode", "error"],
+      "properties": {
+        "exitCode": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "maximum": 255
+        },
+        "error": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pullRequestBody", "githubAttribution"],
+      "properties": {
+        "pullRequestBody": {
+          "type": ["string", "null"],
+          "maxLength": 65536
+        },
+        "githubAttribution": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["tool", "url"],
+              "properties": {
+                "tool": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "url": {
+                  "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/httpUrl" }]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["npmVersion", "vitestVersion", "auditDatabaseUpdatedAt"],
+      "properties": {
+        "npmVersion": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "vitestVersion": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "auditDatabaseUpdatedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "workflowMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "repository", "pullRequestNumber", "baseSha", "headSha"],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" },
+        "repository": { "$ref": "#/$defs/repository" },
+        "pullRequestNumber": { "type": "integer", "minimum": 1 },
+        "pullRequestUrl": { "$ref": "#/$defs/httpUrl" },
+        "pullRequestBody": {
+          "type": "string",
+          "maxLength": 50000,
+          "default": ""
+        },
+        "author": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "authorAssociation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "baseRef": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "baseSha": { "$ref": "#/$defs/sha" },
+        "headRef": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "headSha": { "$ref": "#/$defs/sha" },
+        "appPath": {
+          "allOf": [{ "$ref": "#/$defs/relativePath" }],
+          "default": "."
+        },
+        "samplePath": {
+          "allOf": [{ "$ref": "#/$defs/relativePath" }],
+          "deprecated": true,
+          "description": "Legacy alias for appPath. If both are supplied, runtime validation requires equal values."
+        }
+      }
+    },
+    "reportMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "repository",
+        "pullRequestNumber",
+        "baseSha",
+        "headSha",
+        "generatedAt",
+        "workflowRunUrl",
+        "origin",
+        "tools",
+        "sources"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "1.0.0" },
+        "repository": { "$ref": "#/$defs/repository" },
+        "pullRequestNumber": { "type": "integer", "minimum": 1 },
+        "baseSha": { "$ref": "#/$defs/sha" },
+        "headSha": { "$ref": "#/$defs/sha" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "workflowRunUrl": {
+          "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/httpUrl" }]
+        },
+        "origin": { "$ref": "#/$defs/origin" },
+        "tools": { "$ref": "#/$defs/tools" },
+        "sources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["vitest", "npmAudit", "dataRetention"],
+          "properties": {
+            "vitest": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["reportPath", "coveragePath", "command"],
+              "properties": {
+                "reportPath": {
+                  "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/relativePath" }]
+                },
+                "coveragePath": {
+                  "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/relativePath" }]
+                },
+                "command": { "$ref": "#/$defs/command" }
+              }
+            },
+            "npmAudit": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["reportPath", "command"],
+              "properties": {
+                "reportPath": {
+                  "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/relativePath" }]
+                },
+                "command": { "$ref": "#/$defs/command" }
+              }
+            },
+            "dataRetention": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["declarationPath"],
+              "properties": {
+                "declarationPath": {
+                  "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/relativePath" }]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

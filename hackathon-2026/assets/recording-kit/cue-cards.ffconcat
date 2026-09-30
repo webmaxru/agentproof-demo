@@ -1,0 +1,22 @@
+ffconcat version 1.0
+file 'cue-cards/00.png'
+duration 14
+file 'cue-cards/01.png'
+duration 17
+file 'cue-cards/02.png'
+duration 20
+file 'cue-cards/03.png'
+duration 18
+file 'cue-cards/04.png'
+duration 24
+file 'cue-cards/05.png'
+duration 18
+file 'cue-cards/06.png'
+duration 21
+file 'cue-cards/07.png'
+duration 20
+file 'cue-cards/08.png'
+duration 11
+file 'cue-cards/09.png'
+duration 11
+file 'cue-cards/09.png'

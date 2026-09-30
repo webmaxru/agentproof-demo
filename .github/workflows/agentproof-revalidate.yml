@@ -1,0 +1,71 @@
+name: AgentProof Revalidate
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  repository_dispatch:
+    types:
+      - agentproof-revalidate
+
+permissions: {}
+
+concurrency:
+  group: agentproof-revalidate-discovery
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    name: Discover open pull requests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      pull_requests: ${{ steps.pull-requests.outputs.pull_requests }}
+    steps:
+      - name: Check out trusted dispatcher
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: List open pull requests
+        id: pull-requests
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node .github/scripts/list-open-prs.mjs
+
+  dispatch:
+    name: "Revalidate PR #${{ matrix.pull_request.pr_number }}"
+    needs:
+      - discover
+    if: needs.discover.outputs.pull_requests != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+      checks: write
+      contents: read
+      pull-requests: read
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        pull_request: ${{ fromJSON(needs.discover.outputs.pull_requests) }}
+    concurrency:
+      group: agentproof-gate-pr-${{ matrix.pull_request.pr_number }}
+      cancel-in-progress: true
+    steps:
+      - name: Check out trusted dispatcher
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Invalidate gate and dispatch analysis
+        env:
+          EXPECTED_HEAD_SHA: ${{ matrix.pull_request.head_sha }}
+          GITHUB_TOKEN: ${{ github.token }}
+          INPUT_PR_NUMBER: ${{ matrix.pull_request.pr_number }}
+        run: node .github/scripts/dispatch-open-prs.mjs

@@ -1,0 +1,36 @@
+# Planning/export aid only. This file is not consumed as an approval.
+# The authoritative decision is an authorized native GitHub PR comment.
+# Never include secrets, customer data, or legal conclusions.
+schemaVersion: "1.0.0"
+repository: "<OWNER>/<REPO>"
+pullRequestNumber: <PR_NUMBER>
+headSha: "<40_CHARACTER_HEAD_SHA>"
+finding:
+  id: "<FINDING_ID>"
+  category: "<test|security|policy|provenance>"
+  stateAtDecision: "<fail|unknown|exception>"
+  exceptionableUnderBasePolicy: <true|false>
+policy:
+  path: "policy/release-policy.yml"
+  version: "<POLICY_VERSION>"
+  baseSha: "<40_CHARACTER_BASE_SHA>"
+  sha256: "<64_CHARACTER_POLICY_DIGEST>"
+decision:
+  outcome: "<accept-exception|request-remediation|reject>"
+  actor: "<GITHUB_LOGIN>"
+  rationale: "<SPECIFIC_BOUNDED_RATIONALE>"
+  expires: "<YYYY-MM-DD_OR_NULL>"
+  recordedAt: "<RFC3339_TIMESTAMP>"
+github:
+  commentId: "<COMMENT_ID>"
+  commentUrl: "https://github.com/<OWNER>/<REPO>/pull/<PR_NUMBER>#issuecomment-<COMMENT_ID>"
+  commentBodySha256: "<64_CHARACTER_COMMENT_DIGEST>"
+  independentApprovalUrl: "<REVIEW_URL_OR_NULL>"
+followUp:
+  owner: "<ACCOUNTABLE_OWNER>"
+  remediationIssue: "<URL_OR_NULL>"
+  reviewBy: "<YYYY-MM-DD>"
+notes:
+  - "Acceptance applies only to the named finding and exact head SHA."
+  - "A new commit, edit, deletion, or expiry invalidates this acceptance."
+  - "Exception acceptance does not replace independent PR review or establish compliance."

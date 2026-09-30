@@ -1,0 +1,65 @@
+schemaVersion: 1.0.0
+id: agentproof.release
+version: 1.0.0
+path: policy/release-policy.yml
+rules:
+  tests:
+    suite:
+      findingId: AP-TEST-SUITE-001
+      title: Vitest suite passes
+      severity: high
+      exceptionable: false
+      remediationHint: Fix every failed test and rerun the trusted Vitest command.
+    requiredTests:
+      - findingId: AP-TEST-AUTHORIZATION-001
+        testId: expense-approval.authorization.non-approver-denied
+        title: Non-approver authorization is tested
+        severity: high
+        exceptionable: false
+        remediationHint: Add and pass the test with the required stable AgentProof test ID.
+    coverage:
+      findingId: AP-TEST-COVERAGE-001
+      title: Coverage meets protected thresholds
+      severity: moderate
+      exceptionable: false
+      remediationHint: Add behavioral tests until every protected coverage metric meets its threshold.
+      minimum:
+        lines: 80
+        functions: 80
+        branches: 80
+        statements: 80
+  dependencies:
+    findingId: AP-SEC-NPM-AUDIT-001
+    title: Production dependencies meet severity policy
+    severity: high
+    exceptionable: false
+    remediationHint: Upgrade, replace, or remove the vulnerable production dependency.
+    maximumAllowedSeverity: moderate
+  dataRetention:
+    findingId: AP-POL-RETENTION-001
+    title: Data-retention declaration is complete
+    severity: moderate
+    exceptionable: true
+    remediationHint: Complete the declaration and keep retention within the protected limit.
+    requiredFields:
+      - classification
+      - retentionDays
+      - deletionMethod
+      - owner
+    maximumDays: 30
+  provenance:
+    findingId: AP-PROV-ORIGIN-001
+    title: AI-assistance origin is declared
+    severity: low
+    exceptionable: true
+    remediationHint: Add one bounded AgentProof origin block to the pull request body.
+    requireDeclaration: true
+exceptions:
+  authorizedMinimumPermission: maintain
+  minimumRationaleLength: 20
+  maximumDurationDays: 30
+  allowedFindingStates:
+    - fail
+    - unknown
+    - exception
+  maximumSeverity: high

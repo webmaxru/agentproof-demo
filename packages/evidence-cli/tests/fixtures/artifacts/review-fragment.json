@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "documentType": "review-fragment",
+  "repository": "agentproof/example",
+  "pullRequestNumber": 7,
+  "baseSha": "1111111111111111111111111111111111111111",
+  "headSha": "2222222222222222222222222222222222222222",
+  "policySha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "evidenceArtifactSha256": "c63b1e3c39c09aa7cb190299fe4e475f74627099063d43135efa8f133a2f57bf",
+  "reviewerNote": {
+    "specialist": "policy",
+    "sessionUrl": "https://github.com/copilot/agents/session/fixture",
+    "sourceSha": "2222222222222222222222222222222222222222",
+    "summary": "Fixture policy evidence is consistent.",
+    "findingIds": ["AP-POL-FIXTURE-001"],
+    "createdAt": "2026-09-02T08:40:00.000Z"
+  },
+  "artifact": {
+    "sha256": "2d743a193571ecca7b0dbf429112790bdc2979abd6552ff262ab2d3771022cd0",
+    "workflowRunUrl": null
+  }
+}

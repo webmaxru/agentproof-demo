@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "repository": "agentproof/example",
+  "pullRequestNumber": 7,
+  "baseSha": "1111111111111111111111111111111111111111",
+  "headSha": "2222222222222222222222222222222222222222",
+  "pullRequestUrl": "https://github.com/agentproof/example/pull/7",
+  "pullRequestBody": "## AI assistance origin\n\n- Classification: self-declared\n- Declared tool: GitHub Copilot",
+  "author": "synthetic-developer",
+  "authorAssociation": "MEMBER",
+  "baseRef": "main",
+  "headRef": "feature/evidence",
+  "appPath": "."
+}

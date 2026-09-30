@@ -1,0 +1,152 @@
+name: AgentProof Publish
+
+on:
+  workflow_run:
+    workflows:
+      - AgentProof Analysis
+    types:
+      - completed
+
+permissions: {}
+
+jobs:
+  provenance:
+    name: Validate analysis provenance
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.event == 'pull_request_target' ||
+       github.event.workflow_run.event == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      artifact_id: ${{ steps.provenance.outputs.artifact_id }}
+      artifact_name: ${{ steps.provenance.outputs.artifact_name }}
+      head_sha: ${{ steps.provenance.outputs.head_sha }}
+      pr_number: ${{ steps.provenance.outputs.pr_number }}
+      run_id: ${{ steps.provenance.outputs.run_id }}
+    steps:
+      - name: Check out trusted provenance validator
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Validate workflow run and artifact identity
+        id: provenance
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node .github/scripts/validate-workflow-run.mjs
+
+  publish:
+    name: Evaluate and publish gate
+    needs:
+      - provenance
+    if: needs.provenance.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      checks: write
+      contents: read
+      pull-requests: write
+    concurrency:
+      group: agentproof-gate-pr-${{ needs.provenance.outputs.pr_number }}
+      cancel-in-progress: false
+    env:
+      INCOMING_PATH: ${{ github.workspace }}/.agentproof/incoming
+      METADATA_PATH: ${{ github.workspace }}/.agentproof/incoming/metadata.json
+      RAW_EVIDENCE_PATH: ${{ github.workspace }}/.agentproof/incoming/raw-evidence.json
+      DISPOSITIONS_PATH: ${{ github.workspace }}/.agentproof/dispositions.json
+      FINAL_EVIDENCE_PATH: ${{ github.workspace }}/.agentproof/final-evidence.json
+    steps:
+      - name: Check out trusted publisher bootstrap
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: bootstrap
+          persist-credentials: false
+
+      - name: Download the validated raw evidence artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          artifact-ids: ${{ needs.provenance.outputs.artifact_id }}
+          path: ${{ env.INCOMING_PATH }}
+          merge-multiple: true
+          run-id: ${{ needs.provenance.outputs.run_id }}
+          github-token: ${{ github.token }}
+
+      - name: Validate evidence metadata and live pull request
+        id: metadata
+        env:
+          EXPECTED_ARTIFACT_NAME: ${{ needs.provenance.outputs.artifact_name }}
+          EXPECTED_HEAD_SHA: ${{ needs.provenance.outputs.head_sha }}
+          EXPECTED_PR_NUMBER: ${{ needs.provenance.outputs.pr_number }}
+          EXPECTED_RUN_ID: ${{ needs.provenance.outputs.run_id }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node bootstrap/.github/scripts/read-metadata.mjs
+
+      - name: Check out the protected base revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.metadata.outputs.base_sha }}
+          path: trusted
+          persist-credentials: false
+
+      - name: Verify protected base revision
+        env:
+          EXPECTED_BASE_SHA: ${{ steps.metadata.outputs.base_sha }}
+        run: test "$(git -C trusted rev-parse HEAD)" = "$EXPECTED_BASE_SHA"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Install and build trusted evaluator
+        working-directory: trusted
+        run: |
+          npm ci --ignore-scripts
+          npm run build --workspace @agentproof/evidence-core --workspace @agentproof/evidence-cli
+
+      - name: Collect current GitHub dispositions
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node trusted/.github/scripts/collect-dispositions.mjs
+
+      - name: Evaluate fail-closed policy
+        id: evaluate
+        continue-on-error: true
+        run: >-
+          node trusted/packages/evidence-cli/dist/cli.js evaluate
+          --evidence "$RAW_EVIDENCE_PATH"
+          --policy "$GITHUB_WORKSPACE/trusted/policy/release-policy.yml"
+          --dispositions "$DISPOSITIONS_PATH"
+          --output "$FINAL_EVIDENCE_PATH"
+
+      - name: Require a final evidence document
+        run: test -s "$FINAL_EVIDENCE_PATH"
+
+      - name: Upload commit-bound evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.metadata.outputs.final_artifact_name }}
+          path: ${{ env.FINAL_EVIDENCE_PATH }}
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 90
+
+      - name: Publish required check and PR summary
+        id: publish
+        env:
+          EVIDENCE_PATH: ${{ env.FINAL_EVIDENCE_PATH }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node trusted/.github/scripts/publish-check.mjs
+
+      - name: Reflect a blocking gate in workflow status
+        if: steps.publish.outputs.conclusion != 'success'
+        run: |
+          echo "AgentProof gate is blocking this pull request."
+          exit 1

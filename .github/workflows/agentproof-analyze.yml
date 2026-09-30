@@ -1,0 +1,115 @@
+name: AgentProof Analysis
+
+on:
+  # pull_request_target keeps this workflow definition on the protected base.
+  # The job grants no write scope or secrets and checks out the head only as data.
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Open pull request number to reanalyze
+        required: true
+        type: string
+      expected_head_sha:
+        description: Full pull request head SHA expected by the dispatcher
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: agentproof-analysis-pr-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Collect commit-bound evidence
+    if: >-
+      (github.event_name == 'pull_request_target' &&
+       contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'),
+                github.event.pull_request.author_association)) ||
+      (github.event_name == 'workflow_dispatch' &&
+       github.ref_name == github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      METADATA_PATH: ${{ github.workspace }}/.agentproof-analysis/metadata.json
+      RAW_EVIDENCE_PATH: ${{ github.workspace }}/.agentproof-analysis/raw-evidence.json
+    steps:
+      - name: Check out trusted workflow bootstrap
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          path: bootstrap
+          persist-credentials: false
+
+      - name: Verify workflow bootstrap revision
+        env:
+          EXPECTED_BOOTSTRAP_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+        run: test "$(git -C bootstrap rev-parse HEAD)" = "$EXPECTED_BOOTSTRAP_SHA"
+
+      - name: Resolve pull request
+        id: pr
+        env:
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || inputs.expected_head_sha }}
+          GITHUB_TOKEN: ${{ github.token }}
+          INPUT_PR_NUMBER: ${{ inputs.pr_number }}
+        run: node bootstrap/.github/scripts/resolve-pr.mjs
+
+      - name: Check out the protected base revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.pr.outputs.base_sha }}
+          path: trusted
+          persist-credentials: false
+
+      - name: Verify protected base revision
+        env:
+          EXPECTED_BASE_SHA: ${{ steps.pr.outputs.base_sha }}
+        run: test "$(git -C trusted rev-parse HEAD)" = "$EXPECTED_BASE_SHA"
+
+      - name: Check out pull request subject
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          path: subject
+          persist-credentials: false
+
+      - name: Verify pull request subject revision
+        env:
+          EXPECTED_HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+        run: test "$(git -C subject rev-parse HEAD)" = "$EXPECTED_HEAD_SHA"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Install and build trusted analyzer
+        working-directory: trusted
+        run: |
+          npm ci --ignore-scripts
+          npm run build --workspace @agentproof/evidence-core --workspace @agentproof/evidence-cli
+
+      - name: Collect evidence from the pull request head
+        run: >-
+          node trusted/packages/evidence-cli/dist/cli.js analyze
+          --workspace "$GITHUB_WORKSPACE/subject"
+          --metadata "$METADATA_PATH"
+          --output "$RAW_EVIDENCE_PATH"
+
+      - name: Upload raw evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.pr.outputs.artifact_name }}
+          path: |
+            ${{ env.METADATA_PATH }}
+            ${{ env.RAW_EVIDENCE_PATH }}
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 30

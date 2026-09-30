@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0.0",
+  "documentType": "final",
+  "repository": "agentproof/example",
+  "pullRequestNumber": 7,
+  "baseSha": "1111111111111111111111111111111111111111",
+  "headSha": "2222222222222222222222222222222222222222",
+  "generatedAt": "2026-09-02T08:30:00.000Z",
+  "generatorVersion": "0.1.0",
+  "origin": {
+    "classification": "unknown",
+    "declaredTool": null,
+    "source": "none"
+  },
+  "policy": {
+    "path": "policy/release-policy.yml",
+    "version": "1.0.0",
+    "baseSha": "1111111111111111111111111111111111111111",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "tools": {
+    "nodeVersion": "v22.18.0",
+    "npmVersion": "11.5.0",
+    "vitestVersion": "3.2.4",
+    "auditDatabaseUpdatedAt": null,
+    "agentproofVersion": "0.1.0"
+  },
+  "findings": [
+    {
+      "id": "AP-POL-FIXTURE-001",
+      "category": "policy",
+      "state": "pass",
+      "severity": "info",
+      "title": "Fixture evidence is present",
+      "summary": "This content was changed after the artifact was hashed.",
+      "evidenceRefs": [],
+      "exceptionable": false,
+      "remediationHint": "Regenerate the fixture.",
+      "collector": "fixture",
+      "sourceSha": "2222222222222222222222222222222222222222",
+      "facts": {}
+    }
+  ],
+  "diagnostics": [],
+  "dispositions": [],
+  "reviewerNotes": [],
+  "gate": {
+    "conclusion": "success",
+    "unresolvedFindingIds": [],
+    "counts": {
+      "pass": 1,
+      "fail": 0,
+      "unknown": 0,
+      "exception": 0
+    },
+    "evaluatedAt": "2026-09-02T08:30:00.000Z",
+    "validUntil": null
+  },
+  "artifact": {
+    "sha256": "c63b1e3c39c09aa7cb190299fe4e475f74627099063d43135efa8f133a2f57bf",
+    "workflowRunUrl": null
+  }
+}

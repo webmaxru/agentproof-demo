@@ -1,0 +1,14 @@
+node_modules/
+coverage/
+!packages/evidence-cli/tests/fixtures/coverage/
+!packages/evidence-cli/tests/fixtures/coverage/*.json
+packages/*/dist/
+dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.agentproof/
+.agentproof-analysis/
+agentproof-evidence-*.json
+hackathon-2026/fallback/*.mp4

@@ -1,0 +1,13 @@
+schemaVersion: 1.0.0
+classification: synthetic
+retentionDays: 7
+deletionMethod: process-memory-release
+owner: agentproof-sample-maintainers
+dataCategories:
+  - synthetic-employee-identifiers
+  - synthetic-expense-records
+storageMedium: process-memory
+persistence: none
+deletionTrigger: process-exit-or-seven-days-whichever-occurs-first
+externalSharing: prohibited
+purpose: demonstrate-expense-approval-evidence-checks
