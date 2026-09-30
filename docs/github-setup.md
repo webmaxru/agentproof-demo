@@ -73,8 +73,8 @@ npm ci --ignore-scripts
 npm run check
 npm run test:coverage
 npm run test:integration
-git push origin HEAD:refs/heads/main
-git push -u origin agentproof-reference-implementation
+git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin HEAD:refs/heads/main
+git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push -u origin agentproof-reference-implementation
 ```
 
 The first push publishes the initial populated baseline; it is not a PR merge.
@@ -250,9 +250,51 @@ plugin in another session is not validation of the new kit.
 
 ## Live results and recording handoff
 
-This section is completed from actual GitHub runs after initial publication.
-Until then, no successful live run, canonical evidence digest, green gate,
-exception, or independent approval is asserted.
+### Published baseline
+
+The initial populated baseline is
+[`ce9f1b8e33a7bd58ab1b2eb40149070a356fd083`](https://github.com/webmaxru/agentproof-demo/commit/ce9f1b8e33a7bd58ab1b2eb40149070a356fd083).
+It was published on `main` and `agentproof-reference-implementation` without a
+PR merge. Subsequent setup receipts belong on the project branch and its
+reviewable PR, not on the frozen `main`: changing the base SHA invalidates
+earlier PR evidence even when the head stays unchanged.
+
+| Receipt                                                           | Actual result                                                                                                                                                                                                    |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Baseline GitHub CI                                                | [Run 36787055404](https://github.com/webmaxru/agentproof-demo/actions/runs/36787055404), `Build, lint, and test`: **success**, completed `2026-09-30T22:43:04Z`, head `ce9f1b8e33a7bd58ab1b2eb40149070a356fd083` |
+| `npm run check`                                                   | Passed formatting, lint, type checking, builds, and 96 tests: 20 workflow helpers, 7 app, 33 CLI, 36 core                                                                                                        |
+| `npm run test:coverage`                                           | Passed; all root `src` included, 93.75% lines/statements, 97.05% branches, 88.88% functions; all policy thresholds remain 80%                                                                                    |
+| `npm run test:integration`                                        | Passed: 7 app, 12 CLI, 4 core                                                                                                                                                                                    |
+| `npm audit --ignore-scripts --omit=dev --audit-level=high --json` | Safe Fastify 5.12.1: exit 0, no high/critical findings, one moderate finding allowed by unchanged policy; not a vulnerability-free claim                                                                         |
+| Actual HTTP smoke                                                 | Health, expense creation, non-approver denial, and authorized approval passed against the loopback server; the temporary server was stopped                                                                      |
+| Native tracking-issue comment                                     | [Disposition run 36788040546](https://github.com/webmaxru/agentproof-demo/actions/runs/36788040546) skipped an ordinary comment on issue #2, as intended; no disposition or analysis dispatch resulted           |
+
+The canonical policy identity was independently computed with the built
+baseline core from
+`git show ce9f1b8e33a7bd58ab1b2eb40149070a356fd083:policy/release-policy.yml`,
+using `loadReleasePolicyYaml` and `canonicalSha256`:
+
+```text
+schemaVersion: 1.0.0
+id: agentproof.release
+version: 1.0.0
+path: policy/release-policy.yml
+baseSha: ce9f1b8e33a7bd58ab1b2eb40149070a356fd083
+sha256: e410fd2296d229c99fb80de6422143b3baaf0f4a8174b604b7c1b953b2bf6c4f
+```
+
+This digest identifies the selected baseline policy; it does not claim that
+GitHub currently enforces protection of that branch. The initial automated
+receipt is also preserved in
+[recording readiness](https://github.com/webmaxru/agentproof-demo/issues/2#issuecomment-5921098037).
+
+### PR evidence
+
+Unsafe, separate remediation, and harmless setup PR receipts will be added
+after their actual workflows complete. No PR gate result, canonical evidence
+digest, human exception, independent approval, or merge is inferred from
+baseline CI. A failed publisher workflow can be the expected reflection of a
+valid blocking gate; an operational failure is a different result.
 
 Tracking issues:
 
