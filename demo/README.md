@@ -1,4 +1,4 @@
-# Synthetic recording scenarios
+# Synthetic recording scenarios - TEST CHANGE
 
 `unsafe-change.patch` targets this app-root repository. Apply it only on a
 disposable recording branch, then regenerate and commit the root lockfile with
