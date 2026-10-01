@@ -2,11 +2,16 @@ import { lstat, readdir, readFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
 import {
   assertPositiveInteger,
+  assertSha,
   githubRequest,
   repositoryFromEnvironment,
   setOutput,
 } from "./github-api.mjs";
-import { validateCompletedAnalysisRun, validateEvidenceHandoff } from "./workflow-helpers.mjs";
+import {
+  resolveTrustedWorkflowRevision,
+  validateCompletedAnalysisRun,
+  validateEvidenceHandoff,
+} from "./workflow-helpers.mjs";
 
 const metadataPath = process.env.METADATA_PATH;
 const rawEvidencePath = process.env.RAW_EVIDENCE_PATH;
@@ -53,11 +58,17 @@ const [repositoryData, pullRequest, analysisRun, analysisWorkflow] = await Promi
     `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/actions/workflows/agentproof-analyze.yml`,
   ),
 ]);
+const workflowSha = await resolveTrustedWorkflowRevision({
+  repository: repositoryData,
+  expectedSha: assertSha(process.env.EXPECTED_WORKFLOW_SHA, "EXPECTED_WORKFLOW_SHA"),
+});
 validateCompletedAnalysisRun({
   run: analysisRun,
   workflow: analysisWorkflow,
   repository: repositoryData,
   expectedRunId,
+  expectedWorkflowSha: workflowSha,
+  publisherEvent: process.env.GITHUB_EVENT_NAME,
   expectedRunAttempt: assertPositiveInteger(
     process.env.EXPECTED_RUN_ATTEMPT,
     "EXPECTED_RUN_ATTEMPT",

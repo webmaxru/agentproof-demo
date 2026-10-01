@@ -402,6 +402,29 @@ action pins, Analysis isolation, CI definition, CODEOWNERS, or delivery rules.
 Recording-kit text changes require LF-safe manifest regeneration and exact
 committed Git-blob hash/size verification.
 
+The new candidate imports source
+`a7bd2c29cbe77f4930ee216296205dda110766a6`
+([webmaxru/AgentProof#4](https://github.com/webmaxru/AgentProof/pull/4)); all ten
+mapped runtime files match that immutable handoff. Focused reference validation:
+
+| Exact command                                                                                                                                                                | Candidate result                                                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `node --test --test-reporter=spec .github\scripts\github-api.test.mjs`                                                                                                       | Passed 48/48, including 10 presenter cases                                                                                                     |
+| `npm run test:integration --workspace @agentproof/evidence-cli`                                                                                                              | Passed 25/25, including real Publisher entrypoint and pre-write race regressions                                                               |
+| `npm run typecheck --workspace @agentproof/evidence-cli`                                                                                                                     | Passed                                                                                                                                         |
+| `npm run build --workspace @agentproof/evidence-core --workspace @agentproof/evidence-cli`                                                                                   | Passed                                                                                                                                         |
+| `node .\node_modules\eslint\bin\eslint.js --no-ignore .github\scripts hackathon-2026\assets\recording-kit\capture-state.mjs packages\evidence-cli\tests\integration.test.ts` | Passed                                                                                                                                         |
+| `node --check hackathon-2026\assets\recording-kit\capture-state.mjs`                                                                                                         | Passed                                                                                                                                         |
+| `node hackathon-2026\assets\recording-kit\capture-state.mjs --help`                                                                                                          | Passed without GitHub access                                                                                                                   |
+| `node hackathon-2026\assets\recording-kit\capture-state.mjs --pr 5`                                                                                                          | Expected exit 1: GET-only preflight rejected the undeployed candidate checkout before validator import or presenter output; not a live capture |
+| `python hackathon-2026\assets\recording-kit\generate_assets.py --verify-only`                                                                                                | Passed; only LF-safe manifest refreshed, media unchanged                                                                                       |
+| `git diff --check`                                                                                                                                                           | Passed                                                                                                                                         |
+
+Only declared dependencies were restored after the initial test reported a
+missing `yaml` package; package manifests and lockfile were not changed.
+Native candidate CI is recorded on the new scoped PR, not substituted for
+post-rollout execution of the repaired privileged workflows.
+
 Keep issue #7 open after candidate publication and human merge until actual
 old-base bot Analysis and explicit Publisher runs produce completed,
 correctly blocking checks/artifacts on the unchanged heads. Verify the other

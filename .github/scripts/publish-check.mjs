@@ -14,6 +14,7 @@ import {
   COMMENT_MARKER,
   isAgentProofSummaryComment,
   isGitHubActionsCheckRun,
+  resolveTrustedWorkflowRevision,
   sanitizeMarkdownCell,
   truncateUtf8,
   validateCompletedAnalysisRun,
@@ -61,12 +62,18 @@ async function requireCurrentPullRequest() {
     githubRequest(`${prefix}/actions/runs/${expectedRunId}`),
     githubRequest(`${prefix}/actions/workflows/agentproof-analyze.yml`),
   ]);
+  const workflowSha = await resolveTrustedWorkflowRevision({
+    repository: repositoryData,
+    expectedSha: assertSha(process.env.EXPECTED_WORKFLOW_SHA, "EXPECTED_WORKFLOW_SHA"),
+  });
   validateCompletedAnalysisRun({
     run: analysisRun,
     workflow: analysisWorkflow,
     repository: repositoryData,
     expectedRunId,
     expectedRunAttempt,
+    expectedWorkflowSha: workflowSha,
+    publisherEvent: process.env.GITHUB_EVENT_NAME,
   });
   validateEvidenceHandoff({
     metadata,
@@ -169,7 +176,6 @@ if (!isAgentProofSummaryComment(summaryComment)) {
   throw new Error("GitHub did not create or update the expected AgentProof summary");
 }
 
-await requireCurrentPullRequest();
 const checkRuns = await githubRequest(
   `${prefix}/commits/${headSha}/check-runs?check_name=${encodeURIComponent(CHECK_NAME)}&filter=latest&per_page=100`,
 );
@@ -186,6 +192,7 @@ const checkBodies = buildCompletedCheckPayload({
   title: passed ? "AgentProof evidence is complete" : "AgentProof evidence is blocking",
   summary,
 });
+await requireCurrentPullRequest();
 const checkRun = existingCheck
   ? await githubRequest(
       `${prefix}/check-runs/${assertPositiveInteger(existingCheck.id, "check run id")}`,

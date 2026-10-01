@@ -42,6 +42,7 @@ jobs:
       pr_number: ${{ steps.provenance.outputs.pr_number }}
       run_id: ${{ steps.provenance.outputs.run_id }}
       run_attempt: ${{ steps.provenance.outputs.run_attempt }}
+      workflow_sha: ${{ steps.provenance.outputs.workflow_sha }}
     steps:
       - name: Check out trusted provenance validator
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -81,6 +82,7 @@ jobs:
       EXPECTED_PR_NUMBER: ${{ needs.provenance.outputs.pr_number }}
       EXPECTED_RUN_ID: ${{ needs.provenance.outputs.run_id }}
       EXPECTED_RUN_ATTEMPT: ${{ needs.provenance.outputs.run_attempt }}
+      EXPECTED_WORKFLOW_SHA: ${{ needs.provenance.outputs.workflow_sha }}
     steps:
       - name: Check out trusted publisher bootstrap
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -88,6 +90,9 @@ jobs:
           ref: ${{ github.sha }}
           path: bootstrap
           persist-credentials: false
+
+      - name: Verify publisher bootstrap revision
+        run: test "$(git -C bootstrap rev-parse HEAD)" = "$EXPECTED_WORKFLOW_SHA"
 
       - name: Download the validated raw evidence artifact
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -121,7 +126,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install and build trusted evaluator
+      - name: Install and build current publication validator
+        working-directory: bootstrap
+        run: |
+          npm ci --ignore-scripts
+          npm run build --workspace @agentproof/evidence-core
+
+      - name: Install and build PR-base evaluator
         working-directory: trusted
         run: |
           npm ci --ignore-scripts
@@ -130,7 +141,7 @@ jobs:
       - name: Collect current GitHub dispositions
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node trusted/.github/scripts/collect-dispositions.mjs
+        run: node bootstrap/.github/scripts/collect-dispositions.mjs
 
       - name: Evaluate fail-closed policy
         id: evaluate
@@ -159,7 +170,7 @@ jobs:
         env:
           EVIDENCE_PATH: ${{ env.FINAL_EVIDENCE_PATH }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: node trusted/.github/scripts/publish-check.mjs
+        run: node bootstrap/.github/scripts/publish-check.mjs
 
       - name: Reflect a blocking gate in workflow status
         if: steps.publish.outputs.conclusion != 'success'

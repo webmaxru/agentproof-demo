@@ -1,4 +1,9 @@
-import { assertPositiveInteger, assertRepositoryFullName, assertSha } from "./github-api.mjs";
+import {
+  assertPositiveInteger,
+  assertRepositoryFullName,
+  assertSha,
+  githubRequest,
+} from "./github-api.mjs";
 
 export const ANALYSIS_WORKFLOW_NAME = "AgentProof Analysis";
 export const ANALYSIS_WORKFLOW_PATH = ".github/workflows/agentproof-analyze.yml";
@@ -28,6 +33,35 @@ function sameRepository(left, right) {
     typeof right === "string" &&
     left.toLowerCase() === right.toLowerCase()
   );
+}
+
+export async function resolveTrustedWorkflowRevision(
+  { repository, expectedSha },
+  request = githubRequest,
+) {
+  const fullName = assertRepositoryFullName(repository?.full_name);
+  const defaultBranch = repository?.default_branch;
+  invariant(
+    typeof defaultBranch === "string" && defaultBranch.length > 0,
+    "Repository default branch is missing",
+  );
+  const prefix = `/repos/${fullName.split("/").map(encodeURIComponent).join("/")}`;
+  const branchPath = defaultBranch.split("/").map(encodeURIComponent).join("/");
+  const reference = await request(`${prefix}/git/ref/heads/${branchPath}`);
+  invariant(
+    reference?.ref === `refs/heads/${defaultBranch}` &&
+      reference?.url === `https://api.github.com${prefix}/git/refs/heads/${branchPath}` &&
+      reference?.object?.type === "commit",
+    "Native ref does not identify this repository's default-branch commit",
+  );
+  const workflowSha = assertSha(reference.object.sha, "default-branch workflow SHA");
+  if (expectedSha !== undefined) {
+    invariant(
+      workflowSha === assertSha(expectedSha, "expected workflow SHA"),
+      "Trusted default-branch workflow revision changed",
+    );
+  }
+  return workflowSha;
 }
 
 function assertHttpsUrl(value, label) {
@@ -186,12 +220,19 @@ export function validateAnalysisRunIdentity(options) {
     ["pull_request_target", "workflow_dispatch"].includes(run?.event),
     "Workflow run event is not an allowed analysis trigger",
   );
+  // A pull_request_target run's native head_sha is the PR head, not its workflow revision.
   if (run.event === "workflow_dispatch") {
     invariant(
-      run.head_branch === repository.default_branch &&
+      typeof repository.default_branch === "string" &&
+        repository.default_branch.length > 0 &&
+        run.head_branch === repository.default_branch &&
         run.head_repository?.id === repository.id &&
         sameRepository(run.head_repository?.full_name, repository.full_name),
       "Dispatched analysis did not run from this repository's default branch",
+    );
+    invariant(
+      run.head_sha === assertSha(options.expectedWorkflowSha, "expected analysis workflow SHA"),
+      "Analysis native run does not match the trusted workflow revision",
     );
   }
   return identity;
@@ -203,6 +244,13 @@ export function validateCompletedAnalysisRun(options) {
     options.run?.status === "completed" && options.run?.conclusion === "success",
     "Only successful completed analysis runs can be published",
   );
+  if (Object.hasOwn(options, "publisherEvent")) {
+    invariant(
+      ["workflow_run", "workflow_dispatch"].includes(options.publisherEvent) &&
+        (options.publisherEvent === "workflow_dispatch") === isControllerAnalysis(options.run),
+      "Publisher ingress does not match the analysis controller identity",
+    );
+  }
   return identity;
 }
 
@@ -356,15 +404,27 @@ export function validateNativePublisherRun({
   return identity;
 }
 
-export function validatePublisherRun({ eventName, event, run, workflow, repository, context }) {
+export function validatePublisherRun({
+  eventName,
+  event,
+  run,
+  workflow,
+  repository,
+  context,
+  expectedWorkflowSha,
+}) {
   const identity = validateNativePublisherRun({
     run,
     workflow,
     repository,
     expectedRunId: context.runId,
     expectedRunAttempt: context.runAttempt,
-    expectedHeadSha: context.sha,
+    expectedHeadSha: expectedWorkflowSha,
   });
+  invariant(
+    assertSha(context.sha, "publisher context SHA") === expectedWorkflowSha,
+    "Publisher context does not match the trusted workflow revision",
+  );
   invariant(run.event === eventName, "Publisher event does not match the native run");
   const defaultRef = `refs/heads/${repository.default_branch}`;
   invariant(

@@ -8,7 +8,11 @@ import {
   repositoryFromEnvironment,
   setOutput,
 } from "./github-api.mjs";
-import { APPLICATION_PATH } from "./workflow-helpers.mjs";
+import {
+  ANALYSIS_WORKFLOW_PATH,
+  APPLICATION_PATH,
+  resolveTrustedWorkflowRevision,
+} from "./workflow-helpers.mjs";
 
 const repository = repositoryFromEnvironment();
 const event = await readEvent();
@@ -25,6 +29,21 @@ const [repositoryData, pullRequest] = await Promise.all([
     `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/pulls/${number}`,
   ),
 ]);
+const workflowSha = await resolveTrustedWorkflowRevision({
+  repository: repositoryData,
+  expectedSha: assertSha(process.env.GITHUB_WORKFLOW_SHA, "analysis workflow SHA"),
+});
+const defaultRef = `refs/heads/${repositoryData.default_branch}`;
+if (
+  !["pull_request_target", "workflow_dispatch"].includes(process.env.GITHUB_EVENT_NAME) ||
+  process.env.GITHUB_REF !== defaultRef ||
+  process.env.GITHUB_WORKFLOW_REF !==
+    `${repositoryData.full_name}/${ANALYSIS_WORKFLOW_PATH}@${defaultRef}` ||
+  (process.env.GITHUB_EVENT_NAME === "workflow_dispatch" &&
+    assertSha(process.env.GITHUB_SHA, "analysis dispatch SHA") !== workflowSha)
+) {
+  throw new Error("Analysis context must identify the trusted default-branch workflow");
+}
 if (pullRequest.state !== "open") {
   throw new Error(`Pull request #${number} is not open`);
 }

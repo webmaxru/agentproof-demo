@@ -1,11 +1,13 @@
 import {
   assertPositiveInteger,
+  assertSha,
   githubRequest,
   readEvent,
   repositoryFromEnvironment,
   setOutput,
 } from "./github-api.mjs";
 import {
+  resolveTrustedWorkflowRevision,
   validateAnalysisRun,
   validateDispatchedAnalysis,
   validatePublisherRun,
@@ -21,12 +23,17 @@ const [repositoryData, publisherRun, publisherWorkflow] = await Promise.all([
   githubRequest(`${prefix}/actions/runs/${publisherRunId}`),
   githubRequest(`${prefix}/actions/workflows/agentproof-publish.yml`),
 ]);
+const workflowSha = await resolveTrustedWorkflowRevision({
+  repository: repositoryData,
+  expectedSha: assertSha(process.env.GITHUB_SHA, "publisher workflow SHA"),
+});
 validatePublisherRun({
   eventName,
   event,
   run: publisherRun,
   workflow: publisherWorkflow,
   repository: repositoryData,
+  expectedWorkflowSha: workflowSha,
   context: {
     runId: publisherRunId,
     runAttempt: process.env.GITHUB_RUN_ATTEMPT,
@@ -60,8 +67,10 @@ const validated = validate({
   workflow,
   repository: repositoryData,
   artifacts: artifactPage.artifacts,
+  expectedWorkflowSha: workflowSha,
 });
 
+await setOutput("workflow_sha", workflowSha);
 await setOutput("run_id", validated.runId);
 await setOutput("run_attempt", validated.runAttempt);
 await setOutput("artifact_id", validated.artifactId);
