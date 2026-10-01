@@ -5,9 +5,12 @@ real reviewer output, accepted exception, PR approval, or privacy sign-off.
 The repository's recording guide and live GitHub records remain authoritative.
 
 As of 2026-10-01 the reference repository is public and main has a verified
-active no-bypass ruleset. Independent code-owner onboarding, human decisions,
-and rollout of the candidate automatic-refresh repair remain pending. Draft
-PRs and illustrative media are not proof of the completed review/merge flow.
+active no-bypass ruleset. Protected CODEOWNERS names both `@webmaxru` and
+`@vibeprogrammer`; PR #4 is merged. PR #10's metadata refresh completed the
+native bot Analysis and explicit Publisher chain, but the batch failed for
+old-base PR #5/#6 after successful Analyses. The new old-base repair remains a
+candidate requiring human rollout. Draft PRs and illustrative media are not
+proof of the completed review/merge flow.
 
 | Asset                                   | Use                                                                                                            |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -43,9 +46,11 @@ digests survive commits and fresh checkouts on Windows as well as Linux.
 ## Refresh presenter evidence before recording
 
 From this directory in the reference repository, after its trusted local
-toolchain has been built, use a clean checkout of the current PR **base SHA**,
-not the untrusted PR head. The helper verifies the checkout identity and rejects
-modified evaluator, policy, or workflow-script sources before importing code:
+toolchain has been built, use a clean checkout of the **current protected
+default-branch workflow revision**, not the untrusted PR head or an old frozen
+PR base. The helper independently reads the native protected branch and exact
+default git ref. Local HEAD must match them before any validator is imported.
+Changes outside a reviewed recording-kit overlay are rejected:
 
 ```powershell
 node .\capture-state.mjs --pr <PR_NUMBER>
@@ -55,51 +60,62 @@ The helper uses the saved `webmaxru` GitHub keyring identity, removing inherited
 `GH_TOKEN` and `GITHUB_TOKEN` only in its subprocess environment. It never
 changes the global login, posts a comment, submits a decision, starts a workflow,
 approves, or merges. It rejects stale/mixed identity, incomplete checks, expired
-artifacts, mismatched canonical digests, and incorrect protected-base policy.
+artifacts, mismatched canonical digests, and incorrect immutable PR-base policy.
 GitHub can replace a custom check's `details_url` with its native check page.
 The helper therefore reads the single publisher link from the native check's
-summary, then independently verifies that run, its artifact, and the protected
-policy. A native check-page ID is never treated as a workflow-run ID.
+summary's exact trailing footer and requires the expected head/policy/evidence
+digest header. It independently verifies that registered run and its artifact
+against the current protected workflow revision. Policy is read as data at the
+actual PR base, which may be older. Evidence base/head, policy base/digest, and
+all finding source SHAs must still agree with that subject. A native check-page
+ID is never treated as a workflow-run ID.
 The completed publisher must agree with the native gate: a `failure` is expected
 for genuine blocking evidence and is never relabeled as a passing workflow.
 
-The candidate helper imports `validateNativePublisherRun` only from the clean,
-exact protected-base checkout, never from the PR workflow tree. It validates
+The candidate helper imports `validateNativePublisherRun` and the GET-only
+`resolveTrustedWorkflowRevision` only from the clean protected orchestration
+checkout, never from the PR workflow tree or an arbitrary supplied SHA. It validates
 the registered active Publisher workflow ID/name/path, native repository/head
 repository, current default branch, trusted workflow SHA, exact run/attempt,
 and completed gate conclusion for both native ingress types. It rechecks the
-native run/attempt, live PR/body, and check after download. It does not invent
+native run/attempt, default branch name/tip/protection, clean checkout, live
+PR/body, final artifact, and latest current-head check after download. It does not invent
 a workflow event/context or claim to observe unexposed dispatch inputs.
 Native Publisher identity alone does not prove the new automatic bot handoff.
 
-**Installed versus candidate:** frozen baseline
-`ce9f1b8e33a7bd58ab1b2eb40149070a356fd083` lacks the new native validator.
-This candidate helper deliberately rejects that base. For its installed
-legacy `workflow_run` captures, use the previously reviewed kit at
-`b44e2e892945b6cecbbe6e08c8f8d8c2a3b04e6b`. Do not copy candidate workflow
-scripts into the base checkout to bypass the guard. After authorized human
-rollout installs the shared validators and workflows together, use the new
-helper with the newly resolved protected base and fresh evidence.
+**Installed versus candidate:** the old policy base
+`ce9f1b8e33a7bd58ab1b2eb40149070a356fd083` lacks the native validator; installed
+main `28f185f710848cf20a2c4c047f5499583c7fdcb2` lacks the new workflow-revision
+resolver. Neither is a compatible orchestration checkout for this candidate.
+The reviewed `b44e2e892945b6cecbbe6e08c8f8d8c2a3b04e6b` kit's successful
+legacy captures remain history, not a fallback verification of current
+explicit Publishers. The PR #4 helper's PR-base coupling is also not proof.
+Do not copy candidate workflow/evaluator scripts into a checkout to bypass
+the guard. After authorized human rollout installs the shared validators and
+workflows together, use the new protected default revision and fresh evidence,
+while preserving each subject's independently resolved policy base/head.
 
 For a compatible reviewed helper in an unmerged setup PR, use a clean,
-disposable checkout of the live PR base and copy only that reviewed commit's
+disposable checkout of the live protected default revision and copy only that reviewed commit's
 recording kit into it. From the repository root, after fetching that commit:
 
 ```powershell
 git restore --source "<REVIEWED_KIT_COMMIT_SHA>" --worktree -- .\hackathon-2026\assets\recording-kit
 ```
 
-Keep the evaluator, policy, package files, and workflow scripts at the base
-revision. Do not run the capture from the candidate PR head. This local asset
+Keep the parser, policy, package files, and workflow scripts at that protected
+default revision; the subject's policy is fetched separately at its PR base.
+Do not run the capture from the candidate PR head. This local asset
 overlay does not merge the PR, change `main`, or turn the snapshot into approval.
-With the strict up-to-date rule, later human onboarding/repair merges change
-the base and invalidate old captures. Keep unsafe/remediation heads frozen
-now. The later human-recorded remediation transition must incorporate the
+After a protected default-branch change, resolve both trust anchors again
+and obtain a new capture; a main update does not itself advance a frozen PR's
+head or policy base. Keep unsafe/remediation heads frozen now. Separately,
+the strict up-to-date merge rule means the later human-recorded remediation transition must incorporate the
 then-current protected main without dropping its controls, then resolve the
 resulting full head/base and collect fresh evidence. Prepared PR #6's old head
 is not automatically that new up-to-date head. Its Fastify 5.12.1 audit is now
 historical, not current passing remediation. Include the reviewed current
-runtime/lock fix (5.12.5 in PR #4) as well as the authorization-marker repair.
+runtime/lock fix (5.12.5, now installed through PR #4) as well as the authorization-marker repair.
 
 Every successful capture gets a new ignored `.agentproof\recording` directory.
 The downloaded evidence and `presenter-state.json` are a private, read-only
@@ -107,6 +123,9 @@ snapshot, not a lasting approval. The separate human-decision skeleton has
 deliberately invalid reason/expiry placeholders. A human must recheck the live
 SHA, comments, permission, finding eligibility, and date before submission.
 Do not commit these private presenter outputs or record unrelated metadata.
+The native archive digest is recorded separately from the independently
+verified canonical JSON digest; the helper does not claim to recompute the
+download archive digest or expose hidden Analysis dispatch inputs.
 
 ## Editing and truth rules
 

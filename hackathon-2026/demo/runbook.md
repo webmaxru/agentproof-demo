@@ -64,11 +64,14 @@ isolated, manually started, read-only sessions.
 
 See [current GitHub setup](../../docs/github-setup.md) for this repository's
 actual runs and installed-versus-candidate state. Public main now has a
-verified active no-bypass ruleset. Independent code-owner onboarding, real
-review, and protected-base deployment of the candidate refresh repair remain
-pending. Keep the frozen scenario heads/drafts unchanged; draft-disabled Merge
-is not a check-enforcement test. Do not narrate automatic refresh as repaired
-before a real default-branch run verifies it.
+verified active no-bypass ruleset and both code owners; PR #4 is merged.
+Rollout step 5 verified PR #10's actual metadata controller -> bot Analysis ->
+explicit Publisher. Step 6's batch succeeded for PR #10 but failed for frozen
+old-base PR #5/#6 before Publisher dispatch. The follow-up old-base repair
+still needs human review/rollout and native verification of those failed jobs.
+Keep the frozen scenario heads/drafts unchanged; draft-disabled Merge is not
+a check-enforcement test. Do not narrate a successful whole batch or deployed
+old-base repair from PR #10's successful path.
 
 The 2026-10-01 live audit now reports high advisories for the previously safe
 Fastify 5.12.1 resolution. PR #4's separate dependency fix pins 5.12.5 and
@@ -77,16 +80,16 @@ Earlier safe/PR #6 audit receipts are historical: frozen PR #6's standalone
 head is **not a current passing dependency remediation**. Do not reuse its
 old five-pass/retention-unknown result as a fresh scan.
 
-An authorized human's CODEOWNERS onboarding PR on the vulnerable installed
-base must also include the narrow dependency/lock fix from PR #4, commit
-`f2d89fd432658753346e152a2f20cbdd030cf8ff`, so its required gate can pass.
-The existing owner can review that differently human-authored PR under the
-current base rules. Changing owners alone does not fix the audit; no guessed
-reviewer, exception, bypass, or agent merge substitutes for this process.
+The narrow dependency/lock fix from PR #4, commit
+`f2d89fd432658753346e152a2f20cbdd030cf8ff`, and both CODEOWNERS are now installed.
+Preserve them. The agent cannot substitute a guessed reviewer, exception,
+bypass, or merge for independent human review of the follow-up repair.
 
 The installed strict check rule requires an up-to-date branch. Later human
-CODEOWNERS onboarding and repair rollout will advance main, invalidating these
-old-base captures. Keep current PR #5/#6 heads frozen now. After the first
+repair rollout will advance main. The presenter helper must then use that clean
+protected workflow revision and independently fetch the immutable PR-base policy;
+main advancement does not itself update these PR heads/bases. Keep PR #5/#6
+heads frozen now. After the first
 recorded disposition, the human-recorded remediation transition must include
 the then-current protected main without losing its owners, controls, or
 reviewed dependency/lock fixes. Include the current patched dependency and
@@ -95,8 +98,8 @@ retention. The prepared PR #6 head is not automatically the new PR #5 head.
 Resolve the resulting full SHA/base and collect fresh evidence before further
 decisions.
 
-The human operator must mark setup PR #4 ready before requesting human review.
-After the protected-main rollout, mark recording PR #5 ready before relying on
+Setup PR #4 is already merged. After the new repair's human-controlled
+protected-main rollout and native old-base verification, mark PR #5 ready before relying on
 independent approval or merge-availability UI. This does not advance its head,
 but it triggers revalidation; wait for the repaired current-head check. These
 are later operator steps, not agent changes to the current drafts.

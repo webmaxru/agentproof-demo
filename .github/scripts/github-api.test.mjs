@@ -4,8 +4,16 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { tsImport } from "tsx/esm/api";
 import { parse as parseYaml } from "yaml";
-import { validateCapturedPublisher } from "../../hackathon-2026/assets/recording-kit/capture-state.mjs";
+import {
+  validateCaptureCheckout,
+  validateCapturedArtifact,
+  validateCapturedCheck,
+  validateCapturedEvidence,
+  validateCapturedPublisher,
+  validateCapturedSubject,
+} from "../../hackathon-2026/assets/recording-kit/capture-state.mjs";
 import { ANALYSIS_WAIT_MS, dispatchRevalidation } from "./dispatch-revalidation.mjs";
 import {
   assertPositiveInteger,
@@ -36,17 +44,28 @@ import {
   validateNativePublisherRun,
   validatePublisherRun,
   validateRulesetPayload,
+  validateUnchangedPullRequest,
 } from "./workflow-helpers.mjs";
 
 const HEAD_SHA = "0123456789abcdef0123456789abcdef01234567";
 const BASE_SHA = "89abcdef0123456789abcdef0123456789abcdef";
 const RUN_SHA = "fedcba9876543210fedcba9876543210fedcba98";
 const ARTIFACT_SHA256 = "a".repeat(64);
+const captureCore = await tsImport("../../packages/evidence-core/src/index.ts", import.meta.url);
+const captureFixtures = await tsImport(
+  "../../packages/evidence-core/tests/helpers.ts",
+  import.meta.url,
+);
 
 function captureFixture(eventName = "workflow_dispatch", conclusion = "success") {
   const { run, workflow, repository } = publisherFixture(eventName);
   const workflowRunUrl = `https://github.com/${repository.full_name}/actions/runs/500`;
-  Object.assign(run, { status: "completed", conclusion, html_url: workflowRunUrl });
+  Object.assign(run, {
+    status: "completed",
+    conclusion,
+    html_url: workflowRunUrl,
+    head_sha: RUN_SHA,
+  });
   return {
     run,
     workflow,
@@ -54,12 +73,13 @@ function captureFixture(eventName = "workflow_dispatch", conclusion = "success")
     runId: 500,
     runAttempt: 1,
     baseSha: BASE_SHA,
+    workflowSha: RUN_SHA,
     workflowRunUrl,
     conclusion,
   };
 }
 
-test("presenter validates both native Publisher routes and valid blocking results", () => {
+test("presenter validates both native Publisher routes independently of an older policy base", () => {
   for (const eventName of ["workflow_run", "workflow_dispatch"]) {
     for (const conclusion of ["success", "failure"]) {
       const input = captureFixture(eventName, conclusion);
@@ -69,6 +89,7 @@ test("presenter validates both native Publisher routes and valid blocking result
       });
       assert.equal(Object.hasOwn(input, "event"), false);
       assert.equal(Object.hasOwn(input, "context"), false);
+      assert.notEqual(input.baseSha, input.workflowSha);
     }
   }
 });
@@ -94,7 +115,7 @@ test("presenter rejects stale attempts, untrusted workflow revisions and incompl
       input.run.head_sha = HEAD_SHA;
     },
     (input) => {
-      input.baseSha = HEAD_SHA;
+      input.workflowSha = input.baseSha;
     },
     (input) => {
       input.run.head_repository = { ...input.repository, id: 999 };
@@ -122,11 +143,327 @@ test("presenter rejects stale attempts, untrusted workflow revisions and incompl
   }
 });
 
-test("candidate presenter refuses an installed base without its native validator", () => {
+test("candidate presenter refuses an orchestration checkout without its native validator", () => {
   assert.throws(
     () => validateCapturedPublisher(captureFixture(), undefined),
-    /Protected base lacks the native Publisher validator/,
+    /Protected orchestration checkout lacks the native Publisher validator/,
   );
+});
+
+test("presenter trusts only a clean checkout of the independently resolved protected default", () => {
+  const fixture = {
+    repository: { default_branch: "main" },
+    branch: { name: "main", protected: true, commit: { sha: RUN_SHA } },
+    headSha: RUN_SHA,
+    changes: "",
+  };
+  assert.equal(validateCaptureCheckout(fixture), RUN_SHA);
+  const mutations = [
+    (input) => {
+      input.headSha = BASE_SHA;
+    },
+    (input) => {
+      input.headSha = HEAD_SHA;
+    },
+    (input) => {
+      input.branch.commit.sha = HEAD_SHA;
+    },
+    (input) => {
+      input.branch.protected = false;
+    },
+    (input) => {
+      input.repository.default_branch = "renamed";
+    },
+    (input) => {
+      input.branch.name = "feature";
+    },
+    (input) => {
+      input.changes = " M .github/scripts/workflow-helpers.mjs";
+    },
+  ];
+  for (const mutate of mutations) {
+    const input = structuredClone(fixture);
+    mutate(input);
+    assert.throws(() => validateCaptureCheckout(input));
+  }
+});
+
+function capturedEvidenceFixture({ blockers = false } = {}) {
+  const native = captureFixture();
+  const raw = captureFixtures.rawEvidenceFixture();
+  raw.repository = native.repository.full_name;
+  raw.baseSha = BASE_SHA;
+  raw.headSha = HEAD_SHA;
+  for (const finding of raw.findings) finding.sourceSha = HEAD_SHA;
+  const dispositions = captureFixtures.dispositionInput();
+  if (blockers) {
+    raw.findings.find((finding) => finding.id === captureCore.FINDING_IDS.testSuite).facts = {
+      total: 1,
+      passed: 0,
+      failed: 1,
+      skipped: 0,
+      testCases: [],
+    };
+    raw.findings.find((finding) => finding.id === captureCore.FINDING_IDS.dataRetention).facts = {};
+    raw.findings.find((finding) => finding.id === captureCore.FINDING_IDS.testCoverage).facts = {};
+    dispositions.comments.push(
+      captureFixtures.validAcceptance({
+        body: `/agentproof accept-exception ${captureCore.FINDING_IDS.dataRetention}
+sha: ${HEAD_SHA}
+reason: Synthetic test decision with bounded retention pending remediation.
+expires: 2026-09-20`,
+      }),
+    );
+  }
+  const policy = captureFixtures.policyFixture();
+  const input = captureCore.evaluateEvidence({
+    rawEvidence: captureCore.withArtifactDigest(raw),
+    policy,
+    dispositions,
+    workflowRunUrl: native.workflowRunUrl,
+  });
+  const check = {
+    id: 600,
+    name: "AgentProof / gate",
+    app: { id: 15368 },
+    status: "completed",
+    conclusion: input.gate.conclusion,
+    head_sha: HEAD_SHA,
+    details_url: `https://github.com/${native.repository.full_name}/runs/600`,
+    output: {
+      summary: [
+        `**Result:** ${input.gate.conclusion === "success" ? "PASS" : "BLOCKED"}`,
+        "",
+        `- **Head SHA:** \`${HEAD_SHA}\``,
+        `- **Policy digest:** \`${input.policy.sha256}\``,
+        `- **Evidence digest:** \`${input.artifact.sha256}\``,
+        "- **Counts:** bounded fixture",
+        "",
+        `[Workflow run](${native.workflowRunUrl})`,
+      ].join("\n"),
+    },
+  };
+  return {
+    input,
+    repository: native.repository,
+    prNumber: raw.pullRequestNumber,
+    headSha: HEAD_SHA,
+    baseSha: BASE_SHA,
+    check,
+    policy,
+    now: Date.parse(captureFixtures.EVALUATED_AT),
+  };
+}
+
+test("presenter verifies the exact native check footer and canonical evidence under the old policy", () => {
+  const fixture = capturedEvidenceFixture();
+  assert.deepEqual(validateCapturedEvidence(fixture, captureCore), fixture.input);
+  assert.deepEqual(validateCapturedCheck(fixture), {
+    runId: 500,
+    workflowRunUrl: fixture.input.artifact.workflowRunUrl,
+    policyDigest: fixture.input.policy.sha256,
+    evidenceDigest: fixture.input.artifact.sha256,
+  });
+  fixture.check.details_url = fixture.input.artifact.workflowRunUrl;
+  assert.doesNotThrow(() => validateCapturedEvidence(fixture, captureCore));
+});
+
+test("presenter preserves pass, fail, unknown and exception without relabeling a blocking gate", () => {
+  const fixture = capturedEvidenceFixture({ blockers: true });
+  const evidence = validateCapturedEvidence(fixture, captureCore);
+  assert.equal(evidence.gate.conclusion, "failure");
+  assert.deepEqual([...new Set(evidence.findings.map((finding) => finding.state))].sort(), [
+    "exception",
+    "fail",
+    "pass",
+    "unknown",
+  ]);
+  fixture.now = Date.parse("2026-09-21T00:00:00.000Z");
+  assert.throws(() => validateCapturedEvidence(fixture, captureCore), /validity horizon/);
+});
+
+test("presenter rejects forged checks, ambiguous footers and digest substrings outside the header", () => {
+  const mutations = [
+    (input) => {
+      input.check.app.id = 1;
+    },
+    (input) => {
+      input.check.head_sha = RUN_SHA;
+    },
+    (input) => {
+      input.check.name = "Build, lint, and test";
+    },
+    (input) => {
+      input.check.status = "in_progress";
+    },
+    (input) => {
+      input.check.details_url += "1";
+    },
+    (input) => {
+      input.check.output.summary += "\nnot the footer";
+    },
+    (input) => {
+      input.check.output.summary += `\n\n[Workflow run](${input.input.artifact.workflowRunUrl})`;
+    },
+    (input) => {
+      input.check.output.summary = input.check.output.summary.replace(
+        input.repository.full_name,
+        "other/repository",
+      );
+    },
+    (input) => {
+      input.check.output.summary = input.check.output.summary.replace(
+        `- **Evidence digest:** \`${input.input.artifact.sha256}\``,
+        `Finding text includes ${input.input.artifact.sha256}`,
+      );
+    },
+    (input) => {
+      input.check.output.summary = input.check.output.summary.replace("PASS", "BLOCKED");
+    },
+  ];
+  for (const mutate of mutations) {
+    const input = capturedEvidenceFixture();
+    mutate(input);
+    assert.throws(() => validateCapturedCheck(input));
+  }
+});
+
+test("presenter rejects invalid canonical content, finding sources, policy bases and evidence identities", () => {
+  const mutations = [
+    (fixture) => {
+      fixture.input.findings[0].summary = "Modified without updating canonical digest.";
+    },
+    (fixture) => {
+      fixture.input.findings[0].sourceSha = RUN_SHA;
+      fixture.input = captureCore.withArtifactDigest(fixture.input);
+    },
+    (fixture) => {
+      fixture.input.baseSha = fixture.input.policy.baseSha = RUN_SHA;
+      fixture.input = captureCore.withArtifactDigest(fixture.input);
+    },
+    (fixture) => {
+      fixture.input.repository = "other/repository";
+      fixture.input = captureCore.withArtifactDigest(fixture.input);
+    },
+    (fixture) => {
+      fixture.input.pullRequestNumber += 1;
+      fixture.input = captureCore.withArtifactDigest(fixture.input);
+    },
+    (fixture) => {
+      fixture.input.artifact.workflowRunUrl += "1";
+      fixture.input = captureCore.withArtifactDigest(fixture.input);
+    },
+    (fixture) => {
+      fixture.policy.rules.tests.coverage.minimum.lines -= 1;
+    },
+    (fixture) => {
+      fixture.check.output.summary = fixture.check.output.summary.replace(
+        fixture.input.artifact.sha256,
+        "f".repeat(64),
+      );
+    },
+  ];
+  for (const mutate of mutations) {
+    const fixture = capturedEvidenceFixture();
+    mutate(fixture);
+    assert.throws(() => validateCapturedEvidence(fixture, captureCore));
+  }
+});
+
+test("presenter artifact provenance uses the protected workflow revision, not the old evidence base", () => {
+  const { repository } = captureFixture();
+  const artifactName = `agentproof-evidence-pr-7-${HEAD_SHA}`;
+  const fixture = {
+    artifactName,
+    repository,
+    publisherIdentity: { runId: 500, runAttempt: 1 },
+    workflowSha: RUN_SHA,
+    artifact: {
+      id: 700,
+      name: artifactName,
+      expired: false,
+      size_in_bytes: 1024,
+      digest: `sha256:${ARTIFACT_SHA256}`,
+      workflow_run: {
+        id: 500,
+        repository_id: repository.id,
+        head_branch: repository.default_branch,
+        head_sha: RUN_SHA,
+      },
+    },
+  };
+  assert.doesNotThrow(() => validateCapturedArtifact(fixture));
+  const mutations = [
+    (input) => {
+      input.artifact.workflow_run.head_sha = BASE_SHA;
+    },
+    (input) => {
+      input.artifact.workflow_run.id += 1;
+    },
+    (input) => {
+      input.artifact.workflow_run.repository_id += 1;
+    },
+    (input) => {
+      input.artifact.workflow_run.head_branch = "feature";
+    },
+    (input) => {
+      input.artifact.digest = ARTIFACT_SHA256;
+    },
+    (input) => {
+      input.artifact.name += "-other";
+    },
+    (input) => {
+      input.artifact.expired = true;
+    },
+    (input) => {
+      input.artifact.size_in_bytes = 25 * 1024 * 1024 + 1;
+    },
+  ];
+  for (const mutate of mutations) {
+    const input = structuredClone(fixture);
+    mutate(input);
+    assert.throws(() => validateCapturedArtifact(input));
+  }
+});
+
+test("presenter rechecks native head, body, policy base and default branch after download", () => {
+  const { repository, pullRequest } = evidenceHandoffFixture();
+  pullRequest.base.repo.id = repository.id;
+  pullRequest.updated_at = "2026-10-01T10:00:00Z";
+  const fixture = {
+    repository,
+    pullRequest,
+    previous: structuredClone({ repository, pullRequest }),
+  };
+  assert.doesNotThrow(() => validateCapturedSubject(fixture, validateUnchangedPullRequest));
+  const mutations = [
+    (input) => {
+      input.pullRequest.head.sha = RUN_SHA;
+    },
+    (input) => {
+      input.pullRequest.base.sha = RUN_SHA;
+    },
+    (input) => {
+      input.pullRequest.body += "\nChanged metadata";
+    },
+    (input) => {
+      input.repository.default_branch = input.pullRequest.base.ref = "renamed";
+    },
+    (input) => {
+      input.repository.id += 1;
+    },
+    (input) => {
+      input.pullRequest.updated_at = "2026-10-01T10:01:00Z";
+    },
+    (input) => {
+      input.pullRequest.state = "closed";
+    },
+  ];
+  for (const mutate of mutations) {
+    const input = structuredClone(fixture);
+    mutate(input);
+    assert.throws(() => validateCapturedSubject(input, validateUnchangedPullRequest));
+  }
 });
 
 test("assertSha normalizes a full SHA", () => {

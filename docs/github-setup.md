@@ -7,22 +7,23 @@ and imports upstream snapshot `47fdeeb665d930a599a3530958b8e62325647810`.
 
 ## Current installed state: 2026-10-01
 
-Native repository/ruleset/branch reads confirm that the previous private-plan
-blocker is resolved. The coordinator activated the committed no-bypass delivery
-ruleset, without changing `main` or granting another collaborator access.
+Native repository/ruleset/branch reads confirm the installed state after the
+human merges of onboarding PR #9 and setup PR #4. The no-bypass delivery rules
+remain active. The follow-up old-base repair described below is a new candidate,
+not an agent-authorized deployment.
 
-| Item                         | Verified current value                                                                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Visibility                   | `public`, `private: false`                                                                                                                                    |
-| Protected main               | `protected: true`, `ce9f1b8e33a7bd58ab1b2eb40149070a356fd083`                                                                                                 |
-| Ruleset                      | `24293848`, `AgentProof protected delivery`, `active`, target `~DEFAULT_BRANCH`                                                                               |
-| Required checks              | Strict `AgentProof / gate` and `Build, lint, and test`, both GitHub Actions app `15368`                                                                       |
-| Pull-request rules           | One approving code-owner review, last-push approval, stale-review dismissal, resolved threads; native extra approval for unattributed changes remains enabled |
-| Bypass / destructive pushes  | No bypass actors; deletion and force pushes blocked                                                                                                           |
-| Actions                      | Same four selected full-SHA pins; default token `read`; automated review approval and broad GitHub-owned/verified allowances remain disabled                  |
-| Independent human/code owner | **NOT ONBOARDED**; only verified owner `@webmaxru` is named, and cannot approve their own PR                                                                  |
-| Workflow repair              | **CANDIDATE IN PR #4**, not installed on the unchanged protected base                                                                                         |
-| Runtime dependency           | Installed Fastify `5.12.1` now has high advisories; PR #4's separate `5.12.5` patch passes the current production audit                                       |
+| Item                        | Verified current value                                                                                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Visibility                  | `public`, `private: false`                                                                                                                                    |
+| Protected main              | `protected: true`, `28f185f710848cf20a2c4c047f5499583c7fdcb2`                                                                                                 |
+| Ruleset                     | `24293848`, `AgentProof protected delivery`, `active`, target `~DEFAULT_BRANCH`                                                                               |
+| Required checks             | Strict `AgentProof / gate` and `Build, lint, and test`, both GitHub Actions app `15368`                                                                       |
+| Pull-request rules          | One approving code-owner review, last-push approval, stale-review dismissal, resolved threads; native extra approval for unattributed changes remains enabled |
+| Bypass / destructive pushes | No bypass actors; deletion and force pushes blocked                                                                                                           |
+| Actions                     | Same four selected full-SHA pins; default token `read`; automated review approval and broad GitHub-owned/verified allowances remain disabled                  |
+| Protected CODEOWNERS        | Both `@webmaxru` and `@vibeprogrammer`; an author still cannot independently approve their own PR                                                             |
+| Workflow repair             | PR #4 installed; PR #10 metadata refresh verified; batch old-base PR #5/#6 revalidation failed before Publisher dispatch                                      |
+| Runtime dependency          | Active root manifest and resolved installation are Fastify `5.12.5`; frozen PR #5/#6 dependencies are not changed by main's update                            |
 
 Read-only commands used for the current state, after the authentication
 preamble below:
@@ -35,37 +36,20 @@ gh api repos/webmaxru/agentproof-demo/branches/main
 ```
 
 The ruleset and effective branch rules are real enforcement facts. They are
-not evidence that a human approved or merged anything. All three recording
-PRs remain **DRAFT**: draft-disabled Merge is not a required-check test.
-No person was invented or invited, and no permission was granted as part of
-the implementation.
+not evidence of the recording scenarios' human decisions. PR #9 merged at
+`2026-10-01T10:27:04Z`; PR #4 merged at `2026-10-01T10:36:15Z`.
+PR #5, PR #6, and smoke PR #10 remain **DRAFT** with their heads unchanged.
+Draft-disabled Merge is not a required-check or independent-review test.
 
-An authorized human must designate and onboard a distinct eligible code owner
-on the protected base, following the active rules. Adding a collaborator alone
-does not make them a code owner. The existing author's approval cannot satisfy
-their own PR, and candidate CODEOWNERS edits do not retroactively alter the
-base's owner requirements. Human onboarding, independent review, and the
-protected-main rollout are prerequisites, not steps this agent bypasses.
+The new repair still requires independent human review and protected-main
+rollout. Preserve both installed owners, all policy thresholds, and all active
+controls. Do not reopen merged PR #4 or repeat its earlier onboarding steps.
+After the old-base repair is installed and verified, a human operator may
+ready recording PR #5 for actual review shots, then wait for fresh evidence.
+No ready transition, exception, approval, merge, or frozen-head change is part
+of this implementation.
 
-To avoid an onboarding deadlock, a **human-authored** CODEOWNERS onboarding PR
-based on the vulnerable installed base must also include the narrow two-file
-dependency fix from PR #4, commit
-`f2d89fd432658753346e152a2f20cbdd030cf8ff`. That permits fresh dependency
-evidence to meet the unchanged policy; the existing owner can independently
-review the differently authored PR under the base CODEOWNERS rules. An owner
-change alone does not repair the audit. Do not weaken checks, use an exception
-for this non-exceptionable finding, or substitute an automated author/reviewer.
-
-The operator must mark setup PR #4 **ready for review** before requesting its
-human review. On the still-installed baseline, use the verified owner-origin
-refresh if that metadata change leaves the gate pending; marking ready does
-not deploy the candidate. After protected-main rollout, the operator must
-also mark recording PR #5 ready before relying on independent-approval or
-merge-availability shots. Ready-for-review preserves its head but triggers
-revalidation: wait for the repaired fresh check/artifact. No ready transition,
-approval, merge, or frozen recording-head change is performed by this setup.
-
-## Current runtime audit and narrow remediation
+## Historical runtime audit and installed narrow remediation
 
 The post-freeze check on intermediate setup head
 `f6df4419436d44168ef4aac574ac08388eb1c7f2` found genuine advisory drift:
@@ -104,9 +88,9 @@ application source, or test assertion is changed.
 | `npm run test:coverage`                                                                            | All 7 app tests passed; 93.75% lines/statements, 97.05% branches, 88.88% functions |
 | `npm ls fastify --all`                                                                             | Only the active root `fastify@5.12.5` resolution                                   |
 
-This patch is reviewable, not installed on main. The next frozen PR #4 head
-requires its own native CI, Analysis, Publisher, and current audit evidence;
-the final receipt belongs on issue #2. Frozen PR #6 still declares `5.12.1`:
+This narrow patch landed with PR #4 at protected main
+`28f185f710848cf20a2c4c047f5499583c7fdcb2`. The commands above remain the
+original patch's receipts, not newly executed scans. Frozen PR #6 still declares `5.12.1`:
 its earlier retention-only blocking result is historical, and its standalone
 head is not a current passing dependency remediation.
 
@@ -190,8 +174,8 @@ Before enabling Actions:
 2. Verify every third-party action is pinned to a reviewed full commit SHA.
 3. Confirm untrusted analysis receives no secrets/write token.
 4. Confirm write-capable publisher/disposition code never executes PR code.
-5. Confirm `.github/CODEOWNERS` uses a verified authorized human. `@webmaxru`
-   currently owns all paths but cannot independently approve their own PR.
+5. Preserve `.github/CODEOWNERS` with both `@webmaxru` and `@vibeprogrammer`.
+   Neither author can independently approve their own PR.
 6. Verify native effective rules for workflows, scripts, policy, app, package
    manifests, and evidence code; checked-in JSON alone is not enforcement.
 
@@ -209,8 +193,9 @@ Each was checked with
 Analysis installs only **base-revision** dependencies with `npm ci
 --ignore-scripts`. It stages the subject as data, uses trusted Vitest and
 generated `tests/**/*.test.ts` / `src/**/*.ts` selection, and audits the subject
-root lockfile. The publisher installs/builds only base-revision code; it neither
-installs subject dependencies nor executes PR package scripts/configuration.
+root lockfile. The old-base repair candidate separates current protected orchestration/core
+validation from the immutable PR-base evaluator and policy. Neither publisher
+checkout installs subject dependencies or executes PR package scripts/configuration.
 Retention comes from root `config/data-handling.yml`.
 
 ## 2. Configure Actions
@@ -227,14 +212,14 @@ In **Settings → Actions → General**:
 The checked-in workflows request job-specific permissions. Organization policy
 may further restrict them.
 
-Installed baseline flow (the automatic-refresh gap is tracked in issue #7):
+Installed flow from PR #4 (the remaining old-base gap is tracked in issue #7):
 
-| Workflow                 | Trigger                                            | Writes                                           |
-| ------------------------ | -------------------------------------------------- | ------------------------------------------------ |
-| `AgentProof Analysis`    | PR opened/synchronized; trusted manual dispatch    | Raw artifact only; repository/PR read            |
-| `AgentProof Publish`     | Successful analysis completion                     | Required check, one PR summary, final artifact   |
-| `AgentProof Disposition` | PR comment create/edit/delete; PR metadata refresh | Invalidates and dispatches current-head analysis |
-| `AgentProof Revalidate`  | Every six hours/manual                             | Dispatches analysis for current open PRs         |
+| Workflow                 | Trigger                                                         | Writes                                                 |
+| ------------------------ | --------------------------------------------------------------- | ------------------------------------------------------ |
+| `AgentProof Analysis`    | PR opened/synchronized; trusted manual dispatch                 | Raw artifact only; repository/PR read                  |
+| `AgentProof Publish`     | Non-controller analysis completion or exact controller dispatch | Required check, one PR summary, final artifact         |
+| `AgentProof Disposition` | PR comment create/edit/delete; PR metadata refresh              | Invalidates and dispatches current-head analysis       |
+| `AgentProof Revalidate`  | Every six hours/manual/repository dispatch                      | Dispatches Analysis, then exact Publisher for open PRs |
 
 Applied and read back before initial workflow publication:
 
@@ -312,47 +297,86 @@ The intended target is `main`; use the exact checked-in
 This exact definition is now active as ruleset `24293848`; native effective
 branch rules and `protected: true` were read back. The earlier private-plan
 403 is retained only in the historical receipt. No weaker rule or bypass was
-substituted. The sole current code owner is still the author, so onboarding a
-distinct authorized human remains necessary before their PR can be approved.
+substituted. Both installed code owners remain named; actual scenario approval
+must still come from a distinct authorized human.
 
-## Candidate automatic-refresh repair and human rollout
+## Automatic-refresh rollout and remaining old-base repair
 
 Issue [#7](https://github.com/webmaxru/agentproof-demo/issues/7) records a
-successful bot-dispatched Analysis with no observed following Publisher.
-Its internal cause remains unconfirmed. Owner-authenticated refresh was
-verified separately; it is not proof of the automatic path.
+historical bot-dispatched Analysis with no following Publisher. The original
+handoff repair was installed by the human merge of PR #4. The receipts below
+distinguish the verified same-base path from the newly confirmed old-base
+failure; issue #7 remains open.
 
-PR #4 imports the tested upstream repair from
+### Installed PR #4 and verified rollout step 5
+
+PR #4 imported the upstream repair from
 `8b7f5c5de64a66c24a4d24e928355130757e38f0`, with the context-free native
 Publisher validator from `95f68dc2e5284348cbb24b7d8391946aa9305b96`.
-The existing actions-write
-controller obtains the exact native Analysis run ID from REST API
-`2026-03-10`, waits at most 20 minutes for that run/attempt, rechecks the
-repository, PR head/base/body, and artifact, then explicitly dispatches the
-default-branch Publisher with the exact Analysis ID/attempt. It returns without
-waiting for Publisher so the publisher can acquire the same per-PR gate lock.
-Controllers have 25-minute jobs and scheduled concurrency is bounded to four.
+The actual PR #10 metadata refresh completed this native chain:
 
-Publisher validates its native registered workflow, repository/head repository,
-default branch, context SHA/ref, exact run/attempt, and the native source
-Analysis/artifact. The explicit route requires a controller-origin Analysis;
-normal owner-origin `workflow_run` remains available and duplicate bot
-completion publication is excluded. Analysis permissions/isolation, policy,
-thresholds, action pins, credentials, and application behavior are unchanged.
-All scripts and the three active workflow definitions must roll out together.
+| Stage               | Native receipt                                                                      | Result                                                            |
+| ------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Metadata controller | [36852189875](https://github.com/webmaxru/agentproof-demo/actions/runs/36852189875) | Successful `pull_request_target` Disposition                      |
+| Bot Analysis        | [36852205009](https://github.com/webmaxru/agentproof-demo/actions/runs/36852205009) | Successful `workflow_dispatch`, exact GitHub Actions bot identity |
+| Explicit Publisher  | [36852262081](https://github.com/webmaxru/agentproof-demo/actions/runs/36852262081) | Successful `workflow_dispatch` on protected `main`                |
 
-The API version returns HTTP 200 with `workflow_run_id`, `run_url`, and
-`html_url`; `return_run_details` is not sent. Missing details, invalid IDs,
-wrong native identity, failure, cancellation, timeout, or changed input fail
-closed. No latest-run/list heuristic or 204-success fallback is used.
-The coordinator's owner-origin baseline API probe returned native Analysis
-`36829925551` at `2026-10-01T07:22:14Z`, confirming this response contract.
-That probe did not deploy or exercise the candidate bot handoff.
+The immutable smoke subject is PR #10 head
+`f091bdc0fd7e90b57f7edc100931e3c3b79c2525`, base
+`28f185f710848cf20a2c4c047f5499583c7fdcb2`. This is a genuine installed
+automatic-refresh result, not an owner-origin substitute or a local fixture.
 
-The coordinator owns the consolidated
-[public-enforcement and rollout receipt](https://github.com/webmaxru/agentproof-demo/issues/2#issuecomment-5926903886).
-Final candidate head/test receipts are added there after code and PR body
-freeze, without a self-referential source-commit loop.
+### Rollout step 6: partial batch failure
+
+Repository-dispatch batch
+[36852396567](https://github.com/webmaxru/agentproof-demo/actions/runs/36852396567)
+finished **failure**. Its successful PR #10 matrix job does not validate the
+failed PR #5/#6 jobs.
+
+| Subject | Analysis                                                                                     | Following Publisher / controller result                                                                              |
+| ------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| PR #10  | [36852422551](https://github.com/webmaxru/agentproof-demo/actions/runs/36852422551), success | [36852478120](https://github.com/webmaxru/agentproof-demo/actions/runs/36852478120), success; native gate has 6 pass |
+| PR #5   | [36852421743](https://github.com/webmaxru/agentproof-demo/actions/runs/36852421743), success | Controller failed before Publisher dispatch; gate left pending                                                       |
+| PR #6   | [36852426150](https://github.com/webmaxru/agentproof-demo/actions/runs/36852426150), success | Controller failed before Publisher dispatch; gate left pending                                                       |
+
+Both old-base Analyses used the correct bot identity and uploaded raw artifacts.
+The installed controller incorrectly equated native dispatch workflow
+`head_sha` `28f185f710848cf20a2c4c047f5499583c7fdcb2` with the immutable
+PR/policy base `ce9f1b8e33a7bd58ab1b2eb40149070a356fd083`.
+PR #5 head remains `e445241ec7a8cd913eeb50b0798c03d46816b629`; PR #6 head
+remains `830d2589cee7ab9b2db4b3afa1c93f25ca2b6c73`. Neither is advanced to
+hide the defect. Fresh publication is expected to remain blocking for their
+real findings, including PR #6's now-vulnerable dependency, not turn them green.
+
+### New candidate and human rollout boundary
+
+The follow-up candidate independently resolves the native default-branch
+workflow revision, anchors genuine workflow context to that revision, and
+rechecks native repository/default branch, run/attempt, source identity, and
+subject metadata at handoff and before publication. Policy, evaluator, raw/final
+evidence base, and all finding source SHAs remain bound to the real immutable
+PR base/head. Native `pull_request_target` run `head_sha` is the PR head;
+native `workflow_dispatch` run `head_sha` is the workflow revision. They are
+not interchangeable.
+
+Current protected bootstrap publication/disposition scripts and validators run
+separately from the old PR-base evaluator/policy checkout. An old policy-base
+`publish-check.mjs` cannot silently skip newer source-attempt or handoff checks.
+No synthetic event/context, PR-controlled workflow ref, new credential, or
+permission expansion substitutes for native provenance. All shared scripts and
+their active workflow wiring must roll out together under human review.
+
+The existing bounded dispatch uses REST API `2026-03-10` exact run details,
+not latest-run heuristics or a 204-success fallback. Controllers wait for the
+exact Analysis attempt, then release their per-PR gate lock without waiting
+for Publisher. Their 25-minute job limit and four-way batch bound remain.
+The earlier owner-origin API probe, Analysis `36829925551` at
+`2026-10-01T07:22:14Z`, remains historical contract evidence only.
+
+The coordinator's consolidated
+[public-enforcement and rollout receipt](https://github.com/webmaxru/agentproof-demo/issues/2#issuecomment-5926903886)
+retains earlier setup history. The new scoped PR carries exact candidate
+commands/results and its immutable head, without rewriting earlier receipts.
 
 Local mocked regression tests and PR CI validate the candidate only.
 PR-triggered trusted Analysis/Publish still run the installed base revision;
@@ -360,7 +384,7 @@ any green result must not be presented as execution of the candidate
 privileged workflow. Do not execute PR workflow code with a write token,
 update `main`, merge, or simulate a human exception to bypass rollout.
 
-Candidate local checks completed in this reference checkout:
+Historical PR #4 candidate checks, retained as their original receipts:
 
 | Exact command                                                                                                                | Result                                                                                                                                        |
 | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -372,21 +396,22 @@ Candidate local checks completed in this reference checkout:
 | `git diff --check`                                                                                                           | Passed                                                                                                                                        |
 
 Changed Markdown/MJS/YAML/JSON files also passed the installed Prettier check.
-Scope comparison confirms no application source/tests, retention declaration,
-engine/CLI, policy, action-pin, Analysis-isolation, CI-definition, or
-ruleset-definition changes. The separately reviewed root dependency-manifest
-and lockfile patch is documented above. Final committed-blob and CI receipts
-belong in the coordinator's issue #2 comment after the candidate and PR body
-are frozen.
+The follow-up repair does not regenerate deck/video/slides/captions or change
+application/runtime dependencies, retention declarations, policy thresholds,
+action pins, Analysis isolation, CI definition, CODEOWNERS, or delivery rules.
+Recording-kit text changes require LF-safe manifest regeneration and exact
+committed Git-blob hash/size verification.
 
-Keep issue #7 open until authorized human onboarding/review and protected-main
-deployment are complete, then observe the actual default-branch bot Analysis
-and explicit Publisher, current-head check/artifact, and comment/scheduled
-paths. Capture new base/head/policy/evidence receipts after that rollout:
-the old base's snapshots are history even when a PR head is unchanged.
+Keep issue #7 open after candidate publication and human merge until actual
+old-base bot Analysis and explicit Publisher runs produce completed,
+correctly blocking checks/artifacts on the unchanged heads. Verify the other
+comment/batch paths separately; one successful matrix job is not full batch
+success. Record both the deployed workflow revision and the subject's
+independently resolved base/head/policy/evidence.
 
 The strict required-check rule also requires branches to incorporate current
-main. Human CODEOWNERS onboarding and repair merges will change that base.
+main before merge. That is distinct from revalidating an older immutable
+evidence base. A main update does not itself advance these frozen PR heads/bases.
 Do not advance frozen PR #5/#6 now or update the unsafe PR before its first
 recorded human disposition. During the later authorized recorded transition,
 incorporate the then-current protected main while preserving its owners,
@@ -594,26 +619,36 @@ It never treats a check ID as a workflow-run ID.
 The previously reviewed `b44e2e892945b6cecbbe6e08c8f8d8c2a3b04e6b` helper passed
 real captures for the initial safe, unsafe, and remediation subjects. Those
 are historical installed-baseline results, not tests of the new bot handoff.
-The candidate helper imports the context-free native Publisher validator only
-from the exact clean protected base, validates its registered workflow/default
-branch/trusted SHA/run/attempt, and rechecks native run and subject/body after
-download. It does not fabricate an event/context or observe hidden dispatch
-inputs. On old base `ce9f1b8e33a7bd58ab1b2eb40149070a356fd083`, which lacks that
-validator, the candidate deliberately fails closed. Keep using the reviewed
-legacy kit there rather than copying candidate workflow scripts into the base.
-Both versions reject changes outside their reviewed recording-kit overlay.
+The PR #4 helper incorrectly required its local checkout and Publisher workflow
+SHA to equal the frozen PR policy base. Neither it nor the legacy
+`workflow_run`-only helper verifies a fresh current-default explicit Publisher
+for an old-base PR.
+
+The new candidate uses a clean checkout of the **current protected default
+workflow revision**, independently verified through native branch and git-ref
+GETs, for its core parser and native-only validators. It binds native app
+`15368`, the exact check header/trailing Publisher footer, registered workflow,
+repository/default branch, run/attempt, artifact provenance, and canonical
+digest. Policy is read as data at the real PR base; evidence and every finding
+retain the full subject SHAs. It rechecks the checkout/default branch,
+subject/body, native Publisher attempt, artifact, and latest gate after download.
+It neither fabricates event/context nor claims unexposed Analysis dispatch inputs.
+The installed `28f185f710848cf20a2c4c047f5499583c7fdcb2` checkout lacks the new
+shared workflow-revision resolver, so this candidate still requires human
+rollout. Do not overlay workflow/evaluator scripts to bypass that guard.
+Only a reviewed recording-kit overlay is permitted.
 Follow the
 [recording-kit overlay procedure](../hackathon-2026/assets/recording-kit/README.md#refresh-presenter-evidence-before-recording)
-while the setup PR is unmerged. This preserves the frozen base rather than
-weakening the identity check or advancing `main`.
+after the matching shared orchestration is installed. This preserves the
+frozen subject while independently trusting current protected orchestration.
 
 #### Current remaining human and rollout checks
 
 | Check                                                                          | Actual status                                                                                                             |
 | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | Ruleset / branch protection and enforced merge behavior                        | **NATIVE RULES VERIFIED** on 2026-10-01; interactive review/merge cases remain unperformed; draft state is not proof      |
-| Deploy and verify candidate automatic refresh                                  | **HUMAN ROLLOUT NOT PERFORMED**; issue #7 remains open and main is unchanged                                              |
-| Designate a distinct authorized reviewer and obtain independent approval       | **HUMAN NOT PERFORMED**; sole current collaborator is the author                                                          |
+| Deploy and verify old-base repair                                              | **NEW CANDIDATE, NOT DEPLOYED**; PR #10 refresh verified, PR #5/#6 batch jobs failed; issue #7 remains open               |
+| Obtain independent recording-scenario approval                                 | **HUMAN NOT PERFORMED** for these scenarios; both protected code owners are now installed                                 |
 | Submit, edit, delete, or expire a real eligible acceptance                     | **HUMAN NOT PERFORMED**; no exception comments posted                                                                     |
 | Advance the same unsafe PR after recording its first exception                 | **HUMAN NOT PERFORMED**; unsafe head remains frozen, separate remediation is not this demonstration                       |
 | Dismiss an actual prior approval after a head update                           | **HUMAN NOT PERFORMED**; no prior approval was fabricated                                                                 |
