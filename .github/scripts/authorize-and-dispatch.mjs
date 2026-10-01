@@ -1,11 +1,11 @@
 import {
   collaboratorPermission,
-  githubRequest,
   permissionRank,
   readEvent,
   repositoryFromEnvironment,
 } from "./github-api.mjs";
-import { createPendingGateCheck, loadDefaultBranchPullRequest } from "./gate-check.mjs";
+import { loadDefaultBranchPullRequest } from "./gate-check.mjs";
+import { dispatchRevalidation } from "./dispatch-revalidation.mjs";
 import { classifyDispositionEvent, workflowRunUrlFromEnvironment } from "./workflow-helpers.mjs";
 
 const event = await readEvent();
@@ -39,23 +39,10 @@ const { repositoryData, pullRequest } = await loadDefaultBranchPullRequest(
   repository,
   event.issue.number,
 );
-const identity = await createPendingGateCheck({
+await dispatchRevalidation({
   repository,
   repositoryData,
   pullRequest,
   detailsUrl: workflowRunUrlFromEnvironment(),
   reason: classification.reason,
 });
-await githubRequest(
-  `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/actions/workflows/agentproof-analyze.yml/dispatches`,
-  {
-    method: "POST",
-    body: {
-      ref: repositoryData.default_branch,
-      inputs: {
-        pr_number: String(identity.number),
-        expected_head_sha: identity.headSha,
-      },
-    },
-  },
-);

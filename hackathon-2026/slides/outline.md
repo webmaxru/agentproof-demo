@@ -4,9 +4,11 @@
 Trustworthy](https://innovation-studio.microsoft.com/events/hackathon2026/challenges/executive-challenges)
 
 **Submission thesis:** AgentProof supplies commit-bound evidence and explicit
-human decisions. Blocking merge additionally requires enabled, tested GitHub
-protections; this private reference repository's plan currently blocks that
-configuration. Do not present desired enforcement as an achieved result.
+human decisions. Public main now has verified active no-bypass protections;
+independent code-owner onboarding and the candidate workflow repair's human
+rollout remain pending. A draft-disabled Merge button is not a check/review
+test. Keep historical slides labeled illustrative and use current native
+records for enforcement claims.
 
 **Judge promise:** Show a real red-to-green release decision, not a research
 demo: same-SHA evidence, explicit human disposition, new-SHA invalidation,

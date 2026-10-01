@@ -5,12 +5,14 @@ documentation remains in the repository root and `docs/`; this packet is
 deliberately isolated so the public project README can describe AgentProof
 without event-specific positioning or deadlines.
 
-This migrated packet is now in the **private** app-first reference repository
+This migrated packet is in the **public** app-first reference repository
 `webmaxru/agentproof-demo`. Its original event framing and historical trials
 are not new live evidence. Consult [actual GitHub setup](../docs/github-setup.md)
-before using copy-ready claims: current private-plan protection entitlement,
-human exceptions, independent review, and final privacy sign-off remain
-explicit prerequisites. Do not imply merge enforcement from a red/green check.
+before using copy-ready claims: public main now has a verified active no-bypass
+ruleset, but independent code-owner onboarding, protected-base repair rollout,
+human exceptions/review, and final privacy sign-off remain prerequisites.
+Automatic refresh is still an unmerged candidate. All scenario PRs are draft;
+neither a red/green check nor draft-disabled Merge alone proves the review flow.
 
 ## Contents
 

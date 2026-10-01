@@ -6,7 +6,7 @@ import {
   repositoryFromEnvironment,
   setOutput,
 } from "./github-api.mjs";
-import { validateEvidenceHandoff } from "./workflow-helpers.mjs";
+import { validateCompletedAnalysisRun, validateEvidenceHandoff } from "./workflow-helpers.mjs";
 
 const metadataPath = process.env.METADATA_PATH;
 const rawEvidencePath = process.env.RAW_EVIDENCE_PATH;
@@ -38,14 +38,31 @@ const expectedPullRequestNumber = assertPositiveInteger(
   process.env.EXPECTED_PR_NUMBER,
   "EXPECTED_PR_NUMBER",
 );
-const [repositoryData, pullRequest] = await Promise.all([
+const expectedRunId = assertPositiveInteger(process.env.EXPECTED_RUN_ID, "EXPECTED_RUN_ID");
+const [repositoryData, pullRequest, analysisRun, analysisWorkflow] = await Promise.all([
   githubRequest(
     `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}`,
   ),
   githubRequest(
     `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/pulls/${expectedPullRequestNumber}`,
   ),
+  githubRequest(
+    `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/actions/runs/${expectedRunId}`,
+  ),
+  githubRequest(
+    `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/actions/workflows/agentproof-analyze.yml`,
+  ),
 ]);
+validateCompletedAnalysisRun({
+  run: analysisRun,
+  workflow: analysisWorkflow,
+  repository: repositoryData,
+  expectedRunId,
+  expectedRunAttempt: assertPositiveInteger(
+    process.env.EXPECTED_RUN_ATTEMPT,
+    "EXPECTED_RUN_ATTEMPT",
+  ),
+});
 
 const identity = validateEvidenceHandoff({
   metadata,
@@ -54,7 +71,7 @@ const identity = validateEvidenceHandoff({
     pullRequestNumber: expectedPullRequestNumber,
     headSha: process.env.EXPECTED_HEAD_SHA,
     artifactName: process.env.EXPECTED_ARTIFACT_NAME,
-    runId: process.env.EXPECTED_RUN_ID,
+    runId: expectedRunId,
     serverUrl: process.env.GITHUB_SERVER_URL,
   },
   repository: repositoryData,

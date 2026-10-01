@@ -2,6 +2,10 @@
 
 Review date: 2026-09-02. Repository license: MIT.
 
+The Fastify runtime entry was refreshed on 2026-10-01 for the narrow `5.12.5`
+patch. Its installed package metadata and distributed `LICENSE` retain MIT.
+Other entries retain their original documentation review date.
+
 This record covers declared direct dependencies at documentation time. The
 committed `package-lock.json` is authoritative for exact resolved versions and
 transitive packages; regenerate the inventory whenever it changes. A package
@@ -21,7 +25,7 @@ license is not a security, privacy, export, patent, or compliance approval.
 
 | Package               | Declared range | Use                             | SPDX license | Source to verify                                    |
 | --------------------- | -------------- | ------------------------------- | ------------ | --------------------------------------------------- |
-| `fastify`             | `5.12.1`       | Synthetic API runtime           | MIT          | Package metadata and `fastify/fastify` license      |
+| `fastify`             | `5.12.5`       | Synthetic API runtime           | MIT          | Package metadata and `fastify/fastify` license      |
 | `yaml`                | `^2.8.1`       | Policy/data declaration parsing | ISC          | Package metadata and `eemeli/yaml` license          |
 | `zod`                 | `^3.25.76`     | Runtime contract validation     | MIT          | Package metadata and `colinhacks/zod` license       |
 | `@eslint/js`          | `^10.0.1`      | Root JavaScript lint rules      | MIT          | Package metadata and `eslint/eslint` license        |

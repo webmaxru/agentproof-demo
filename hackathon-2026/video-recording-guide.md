@@ -7,12 +7,14 @@ agentic-delivery control loop, not to present a compliance certification or
 claim universal model provenance.
 
 **Reference-repository preflight:** use `webmaxru/agentproof-demo` and the actual
-run/settings record in [GitHub setup](../docs/github-setup.md). This repository
-remains private and currently lacks plan entitlement for rulesets/branch
-protection. Do not claim that a red gate blocks merge, or record a merge-button
-transition as proof of enforcement, until that prerequisite is resolved and
-tested. A retention exception and independent approval are human actions, not
-recording assets that an agent can supply.
+run/settings record in [GitHub setup](../docs/github-setup.md). On 2026-10-01
+the public repository's active no-bypass delivery rules and protected main
+were verified natively. Independent code-owner onboarding and the candidate
+automatic-refresh repair's protected-main rollout are still pending.
+All recording PRs remain draft; a draft-disabled Merge button is not evidence
+of required-check or review enforcement. Record that transition only after
+appropriate human onboarding, readiness, and real review. A retention
+exception and independent approval are human actions, not recording assets.
 
 ## 1. Final deliverable
 
@@ -77,6 +79,11 @@ Complete these steps before opening the recorder:
 11. Keep the unsafe PR at its original head until its first human disposition is
     captured. A separately prepared remediation PR is not a substitute for the
     later recorded same-PR transition.
+12. A human operator must mark setup PR #4 ready before requesting its human
+    review and protected-main rollout. After that rollout, mark recording PR #5
+    ready before independent-approval or merge-availability shots. Ready status
+    preserves its head but triggers revalidation; wait for the repaired fresh
+    check/artifact. Keep current drafts/heads unchanged during preparation.
 
 ## 4. Privacy and recording controls
 
@@ -157,7 +164,18 @@ procedure is the operational version:
 1. Switch to the prepared remediation view.
 2. Show the dependency fix and authorization-test marker restoration.
 3. Push the real remediation commit.
+   The strict up-to-date rule also requires the human-controlled transition
+   to incorporate the then-current protected main, preserving its reviewed
+   controls/workflows and onboarded owners. Do not advance the current unsafe
+   head before its first recorded human disposition. The prepared separate
+   PR #6 head is not automatically the final up-to-date PR #5 head. Its old
+   Fastify 5.12.1 audit is now historical, not current passing remediation:
+   include the reviewed current runtime/lock fix (5.12.5 in PR #4) as well as
+   the prepared authorization-marker restoration.
 4. Return to the pull request and wait for the new head SHA to appear.
+   Resolve its actual full base/head again and collect new evidence; main
+   advances from human onboarding/repair rollout invalidate old-base captures,
+   even where the earlier subject head had not changed.
 5. Show the old disposition/evidence becoming stale or ineffective.
 6. Show old-approval dismissal only if a genuine prior independent approval and
    enforced stale-review setting exist. Otherwise omit that shot and explicitly
@@ -171,9 +189,10 @@ procedure is the operational version:
 4. Record a new retention exception if it is still required.
 5. Show the final green gate and matching artifact digest.
 6. Switch to the distinct reviewer profile and approve the pull request.
-7. Show merge becoming available only after actual protection enforcement has
-   been verified. If the private-plan blocker remains, disclose it and omit the
-   enforcement claim. Do not merge.
+7. Show merge becoming available only on an appropriate human-readied PR after
+   actual protection and independent review have been demonstrated. Otherwise
+   disclose the missing human/rollout prerequisites and omit that shot. Do not
+   merge or treat the current draft state as enforcement proof.
 
 ### Take D — boundary and limitation
 

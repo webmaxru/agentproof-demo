@@ -20,13 +20,25 @@ not override deterministic findings.
 AgentProof produces evidence, not a legal, privacy, security, or regulatory
 certification. All expense identities and data are synthetic.
 
-**Protection limitation:** this repository remains private. Its current GitHub
-plan returns HTTP 403 for rulesets and branch protection. The checked-in
-ruleset requires both `AgentProof / gate` and `Build, lint, and test`, but is
-**not enforced** until an authorized human resolves that entitlement.
-The repository owner cannot supply independent review of their own PR.
-See [the actual setup record](docs/github-setup.md); do not record or claim
-merge protection that has not been demonstrated.
+**Current setup, 2026-10-01:** this repository is public. Active no-bypass
+ruleset `24293848` protects `main`, requiring both `AgentProof / gate` and
+`Build, lint, and test`, code-owner/independent review, last-push approval,
+stale-review dismissal, and resolved conversations. Native branch/rule reads
+confirm enforcement; the earlier private-plan HTTP 403 is historical.
+
+**Rollout boundary:** the automatic-refresh repair in setup PR #4 is a
+candidate, not installed on protected `main`. Issue #7 stays open until the
+real default-branch bot handoff publishes successfully. A distinct authorized
+human code owner still needs onboarding; the author cannot approve their own
+PR. All recording PRs remain draft, so a disabled Merge button is not itself
+proof of a required-check or review decision. See [the setup record](docs/github-setup.md).
+
+**Runtime audit update:** current advisories now block the installed Fastify
+5.12.1 dependency. PR #4 separately pins Fastify 5.12.5; its production audit
+has no high/critical findings and one allowed moderate finding. A human-authored
+CODEOWNERS onboarding PR must include that narrow reviewed dependency/lock fix
+so its required gate can pass. Frozen PR #6 and its earlier passing dependency
+receipt are historical, not current remediation proof.
 
 ## Run the application
 
@@ -58,7 +70,7 @@ tests/                    Behavioral API tests and stable AP-ID marker
 config/data-handling.yml  Synthetic retention declaration
 packages/evidence-core/   Private, vendored policy/evidence engine
 packages/evidence-cli/    Private, vendored collectors and evaluator
-.github/                  Trusted workflows, scripts, and desired ruleset
+.github/                  Trusted workflows, scripts, and installed ruleset definition
 policy/                   Base-revision policy and schema
 demo/                     Synthetic fixture and recording scenario patches
 hackathon-2026/           Recording guide, historical draft, and recording assets
@@ -122,8 +134,9 @@ execute PR-controlled code. See [architecture](docs/architecture.md),
 
 - Node.js 22 or later and npm.
 - Git.
-- A private GitHub.com repository, represented below as `<OWNER>/<REPO>`, with
-  GitHub Actions and repository rulesets (or equivalent branch protection).
+- A GitHub.com repository, represented below as `<OWNER>/<REPO>`, with
+  GitHub Actions and enforceable repository rules. This reference is public;
+  private deployments need an eligible plan.
 - GitHub Copilot App/CLI access with cloud sessions, plugins, canvas
   extensions, and installed-agent or deep-link session launch for the intended
   users.
@@ -179,14 +192,16 @@ owners.
      decision-maker;
    - stale approval dismissal;
    - code-owner review for workflows, policy, app, and evidence code;
-   - resolved conversations; and
-   - no bypass except a documented break-glass group.
+   - resolved conversations;
+   - approval of the last push by a distinct reviewer; and
+   - no bypass actors.
 6. Limit Actions to approved, SHA-pinned actions and retain the default
    read-only workflow token unless an individual workflow explicitly needs
    more.
 
-The ruleset is desired configuration, not proof of private-plan enforcement.
-Exact instructions, current blockers, and acceptance tests are in
+This reference's ruleset is now installed and verified through native APIs.
+That does not supply the missing human reviewer or deploy unmerged workflow
+changes. Exact instructions, rollout prerequisites, and acceptance tests are in
 [GitHub setup](docs/github-setup.md).
 
 ## Copilot App reviewer setup

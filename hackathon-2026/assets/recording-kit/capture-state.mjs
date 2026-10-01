@@ -34,13 +34,58 @@ function gh(args) {
 
 function api(path, paginate = false) {
   return JSON.parse(
-    gh(["api", "--hostname", "github.com", ...(paginate ? ["--paginate", "--slurp"] : []), path]),
+    gh([
+      "api",
+      "--method",
+      "GET",
+      "--hostname",
+      "github.com",
+      "--header",
+      "X-GitHub-Api-Version: 2026-03-10",
+      ...(paginate ? ["--paginate", "--slurp"] : []),
+      path,
+    ]),
   );
 }
 
 function commitSha(value, label) {
   assert(typeof value === "string" && /^[0-9a-f]{40}$/u.test(value), `${label} is not a full SHA.`);
   return value;
+}
+
+export function validateCapturedPublisher(
+  {
+    run,
+    workflow,
+    repository: repositoryData,
+    runId,
+    runAttempt,
+    baseSha,
+    workflowRunUrl,
+    conclusion,
+  },
+  validateNativePublisherRun,
+) {
+  assert(
+    typeof validateNativePublisherRun === "function",
+    "Protected base lacks the native Publisher validator. This candidate helper requires human rollout; use the reviewed b44e2e892945b6cecbbe6e08c8f8d8c2a3b04e6b kit for the legacy installed base.",
+  );
+  const identity = validateNativePublisherRun({
+    run,
+    workflow,
+    repository: repositoryData,
+    expectedRunId: runId,
+    expectedRunAttempt: runAttempt,
+    expectedHeadSha: baseSha,
+  });
+  assert(
+    ["success", "failure"].includes(conclusion) &&
+      run.html_url === workflowRunUrl &&
+      run.status === "completed" &&
+      run.conclusion === conclusion,
+    "Publisher URL, completion state, or conclusion does not match the native gate.",
+  );
+  return identity;
 }
 
 async function capture(prNumber) {
@@ -50,10 +95,13 @@ async function capture(prNumber) {
     "Expected the webmaxru human account in the local GitHub keyring.",
   );
   const prefix = `repos/${repository}`;
+  const repositoryData = api(prefix);
   const pr = api(`${prefix}/pulls/${prNumber}`);
   assert(pr.state === "open", "The recording PR must still be open.");
   assert(
-    pr.base.repo.full_name.toLowerCase() === repository.toLowerCase(),
+    pr.base.repo.full_name.toLowerCase() === repository.toLowerCase() &&
+      pr.base.repo.id === repositoryData.id &&
+      pr.base.ref === repositoryData.default_branch,
     "PR repository mismatch.",
   );
   const headSha = commitSha(pr.head.sha, "PR head");
@@ -73,35 +121,21 @@ async function capture(prNumber) {
     "Gate is not a completed evidence result.",
   );
   assert(check.head_sha === headSha, "Check does not describe the current head.");
-  const runMatch =
-    /^https:\/\/github\.com\/webmaxru\/agentproof-demo\/actions\/runs\/([1-9]\d*)$/u.exec(
-      check.details_url,
-    );
-  assert(runMatch, "Check is not linked to this repository's publisher workflow.");
-  const runId = runMatch[1];
+  const publisherLinks = [
+    ...(check.output?.summary ?? "").matchAll(
+      /^\[Workflow run\]\((https:\/\/github\.com\/webmaxru\/agentproof-demo\/actions\/runs\/([1-9]\d*))\)$/gmu,
+    ),
+  ];
+  assert(publisherLinks.length === 1, "Expected one unambiguous publisher link in the check.");
+  const [, workflowRunUrl, runId] = publisherLinks[0];
+  assert(
+    check.details_url === workflowRunUrl ||
+      check.details_url === `https://github.com/${repository}/runs/${check.id}`,
+    "Check is not linked to this repository's publisher workflow or native check page.",
+  );
   const run = api(`${prefix}/actions/runs/${runId}`);
-  assert(
-    run.repository?.full_name.toLowerCase() === repository.toLowerCase() &&
-      run.name === "AgentProof Publish" &&
-      run.event === "workflow_run" &&
-      run.path === ".github/workflows/agentproof-publish.yml" &&
-      run.status === "completed" &&
-      run.conclusion === check.conclusion,
-    "Unexpected publisher workflow identity or state.",
-  );
-  const artifactName = `agentproof-evidence-pr-${prNumber}-${headSha}`;
-  const artifacts = api(`${prefix}/actions/runs/${runId}/artifacts?per_page=100`, true)
-    .flatMap((page) => page.artifacts)
-    .filter((artifact) => artifact.name === artifactName && !artifact.expired);
-  assert(
-    artifacts.length === 1,
-    "Expected exactly one unexpired final artifact from this publisher run.",
-  );
-  const artifact = artifacts[0];
-  assert(
-    artifact.size_in_bytes > 0 && artifact.size_in_bytes <= 25 * 1024 * 1024,
-    "Final artifact exceeds the permitted download bound.",
-  );
+  const publisherWorkflowPath = `${prefix}/actions/workflows/agentproof-publish.yml`;
+  const publisherWorkflow = api(publisherWorkflowPath);
   const corePath = join(root, "packages", "evidence-core", "dist", "index.js");
   const trustedHead = spawnSync("git", ["rev-parse", "HEAD"], {
     cwd: root,
@@ -114,7 +148,7 @@ async function capture(prNumber) {
   );
   const trustedChanges = spawnSync(
     "git",
-    ["status", "--porcelain", "--", "packages/evidence-core", "policy", ".github/scripts"],
+    ["status", "--porcelain", "--", ".", ":(exclude)hackathon-2026/assets/recording-kit"],
     {
       cwd: root,
       encoding: "utf8",
@@ -123,7 +157,45 @@ async function capture(prNumber) {
   );
   assert(
     trustedChanges.status === 0 && trustedChanges.stdout.trim() === "",
-    "Trusted evaluator, policy, or script sources are modified. Use the reviewed base checkout.",
+    "The base checkout has changes outside the reviewed recording kit. Use a clean base checkout.",
+  );
+  const validators = await import(
+    pathToFileURL(join(root, ".github", "scripts", "workflow-helpers.mjs")).href
+  );
+  const publisherIdentity = validateCapturedPublisher(
+    {
+      run,
+      workflow: publisherWorkflow,
+      repository: repositoryData,
+      runId,
+      runAttempt: run.run_attempt,
+      baseSha,
+      workflowRunUrl,
+      conclusion: check.conclusion,
+    },
+    validators.validateNativePublisherRun,
+  );
+  assert(
+    typeof validators.validateUnchangedPullRequest === "function",
+    "Protected base lacks the current subject validator; complete the human-controlled rollout.",
+  );
+  const artifactName = `agentproof-evidence-pr-${prNumber}-${headSha}`;
+  const artifacts = api(`${prefix}/actions/runs/${runId}/artifacts?per_page=100`, true)
+    .flatMap((page) => page.artifacts)
+    .filter((artifact) => artifact.name === artifactName && !artifact.expired);
+  assert(
+    artifacts.length === 1,
+    "Expected exactly one unexpired final artifact from this publisher run.",
+  );
+  const artifact = artifacts[0];
+  assert(
+    artifact.size_in_bytes > 0 &&
+      artifact.size_in_bytes <= 25 * 1024 * 1024 &&
+      artifact.workflow_run?.id === publisherIdentity.runId &&
+      artifact.workflow_run?.repository_id === repositoryData.id &&
+      artifact.workflow_run?.head_branch === repositoryData.default_branch &&
+      artifact.workflow_run?.head_sha === baseSha,
+    "Final artifact size or native Publisher provenance is invalid.",
   );
   await access(corePath).catch(() => {
     throw new Error(
@@ -154,7 +226,7 @@ async function capture(prNumber) {
     "Final evidence subject mismatch.",
   );
   assert(
-    evidence.artifact.workflowRunUrl === check.details_url,
+    evidence.artifact.workflowRunUrl === workflowRunUrl,
     "Evidence names another workflow run.",
   );
   assert(
@@ -193,12 +265,31 @@ async function capture(prNumber) {
         core.SEVERITIES.indexOf(policy.exceptions.maximumSeverity),
   );
   const live = api(`${prefix}/pulls/${prNumber}`);
+  const latestRepository = api(prefix);
+  validators.validateUnchangedPullRequest({
+    repository: latestRepository,
+    pullRequest: live,
+    previous: pr,
+  });
   assert(
     live.state === "open" &&
       live.head.sha === headSha &&
       live.base.sha === baseSha &&
       live.updated_at === pr.updated_at,
     "PR changed during capture. Discard the download and run again.",
+  );
+  validateCapturedPublisher(
+    {
+      run: api(`${prefix}/actions/runs/${runId}`),
+      workflow: api(publisherWorkflowPath),
+      repository: latestRepository,
+      runId: publisherIdentity.runId,
+      runAttempt: publisherIdentity.runAttempt,
+      baseSha,
+      workflowRunUrl,
+      conclusion: check.conclusion,
+    },
+    validators.validateNativePublisherRun,
   );
   const latestCheck = api(`${prefix}/check-runs/${check.id}`);
   assert(
@@ -216,7 +307,10 @@ async function capture(prNumber) {
     baseSha,
     headSha,
     checkUrl: check.html_url,
-    workflowRunUrl: check.details_url,
+    workflowRunUrl,
+    publisherEvent: run.event,
+    publisherRunAttempt: publisherIdentity.runAttempt,
+    publisherWorkflowSha: run.head_sha,
     artifactName,
     artifactId: artifact.id,
     githubArchiveDigest: artifact.digest ?? null,
@@ -241,7 +335,8 @@ async function capture(prNumber) {
       "The local keyring account's permission is recorded, not treated as a submitted decision.",
       "Re-resolve head, comments, permissions, eligibility and expiry immediately before any HUMAN submission.",
       "GitHub archive digest and canonical JSON evidence digest are different values.",
-      "Private repository ruleset entitlement must be resolved before recording enforced merge behavior.",
+      "Native Publisher identity is verified; this snapshot does not independently expose dispatch inputs or prove the automatic bot handoff.",
+      "Use current native rules and a distinct authorized human code owner; a draft-disabled Merge button is not enforcement proof.",
     ],
   };
   await writeFile(
@@ -287,22 +382,24 @@ async function capture(prNumber) {
   );
 }
 
-const args = process.argv.slice(2);
-if (args.length === 1 && args[0] === "--help") {
-  console.log(
-    "node capture-state.mjs --pr <number>\nRead-only current-SHA artifact capture. Writes only ignored .agentproof/recording output.\nUses the existing webmaxru keyring login; never posts, dispatches, approves, accepts, or merges.",
-  );
-} else if (
-  args.length !== 2 ||
-  args[0] !== "--pr" ||
-  !/^[1-9]\d*$/u.test(args[1]) ||
-  !Number.isSafeInteger(Number(args[1]))
-) {
-  console.error("Usage: node capture-state.mjs --pr <positive-safe-integer>");
-  process.exitCode = 1;
-} else {
-  await capture(Number(args[1])).catch((error) => {
-    console.error(`Recording capture rejected: ${error.message}`);
+if (resolve(process.argv[1] ?? "") === fileURLToPath(import.meta.url)) {
+  const args = process.argv.slice(2);
+  if (args.length === 1 && args[0] === "--help") {
+    console.log(
+      "node capture-state.mjs --pr <number>\nRead-only current-SHA artifact capture. Writes only ignored .agentproof/recording output.\nUses the existing webmaxru keyring login; never posts, dispatches, approves, accepts, or merges.",
+    );
+  } else if (
+    args.length !== 2 ||
+    args[0] !== "--pr" ||
+    !/^[1-9]\d*$/u.test(args[1]) ||
+    !Number.isSafeInteger(Number(args[1]))
+  ) {
+    console.error("Usage: node capture-state.mjs --pr <positive-safe-integer>");
     process.exitCode = 1;
-  });
+  } else {
+    await capture(Number(args[1])).catch((error) => {
+      console.error(`Recording capture rejected: ${error.message}`);
+      process.exitCode = 1;
+    });
+  }
 }

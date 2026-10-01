@@ -54,7 +54,9 @@ setup/product-feedback templates, not evidence of deployed controls.
 - **Publisher:** artifact/content read plus only the check/PR-summary write scopes
   required to publish validated results; it never runs PR code.
 - **Disposition/revalidation:** read current PR/comment state and dispatch trusted
-  analysis; they do not approve exceptions themselves.
+  analysis; the candidate repair also dispatches Publisher after exact-run
+  validation using the same existing actions-write scope. It never waits for
+  Publisher while holding its gate lock or approves exceptions itself.
 - **Manual App reviewers:** repository, PR, check, and artifact read only.
   Disable comments, push, merge, issue mutation, secrets, cross-repository, and
   unrelated MCP access. Run the Evidence Assembler manually after all three
@@ -72,6 +74,13 @@ An exception acceptance is a native GitHub PR comment authored by an authorized
 release manager, bound to a finding and exact SHA, with a reason and expiry.
 It does not equal PR approval. A different reviewer evaluates the code and the
 repository ruleset requires both independent approval and a green gate.
+
+On 2026-10-01 this public reference's no-bypass ruleset and effective main
+branch rules were verified. No distinct human code owner has been onboarded.
+All scenario PRs remain draft, so draft-disabled Merge is not a review or
+required-check test. The candidate refresh repair is unmerged; automatic
+comment/scheduled publication remains unverified until protected-base rollout
+and a genuine native end-to-end run. Issue #7 stays open in the meantime.
 
 Emergency bypass, if the organization permits one, must be a separately
 authorized break-glass process with reason, time, actor, incident/reference,

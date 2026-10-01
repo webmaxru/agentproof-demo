@@ -2,9 +2,10 @@
 
 ## Goal and trust statement
 
-AgentProof proves a bounded statement: for one repository, policy version, and
-pull-request head SHA, configured deterministic evidence was evaluated and an
-explicit human decision plus independent review governed merge.
+AgentProof evaluates a bounded statement for one repository, policy version,
+and pull-request head SHA: configured evidence and dispositions satisfy the
+selected policy. Enforced repository rules and a distinct human reviewer
+separately govern merge; an evidence artifact is not an approval or a merge.
 
 It does **not** prove universal authorship, security, privacy, legal compliance,
 or production fitness.
@@ -55,9 +56,19 @@ flowchart LR
    repository, PR, schema, artifact metadata, policy base SHA, and current head
    SHA before writing.
 3. **Disposition:** never executes PR code. It authorizes the actor and command,
-   then dispatches a fresh analysis rather than trusting a canvas draft.
-4. **Revalidate:** periodically dispatches fresh evidence for open PRs so
-   expiry/deletion cannot preserve an obsolete decision indefinitely.
+   then requests fresh evidence rather than trusting a canvas draft.
+4. **Revalidate:** requests fresh evidence periodically for open PRs. The
+   installed baseline's automatic publication gap remains tracked in issue #7.
+
+The candidate repair in PR #4 uses the controller's existing actions-write
+scope to receive an exact native Analysis ID, wait boundedly for that run and
+attempt, recheck the live subject/body, and explicitly dispatch the trusted
+default-branch Publisher. It releases gate concurrency without waiting for
+Publisher. The publisher validates native run/default-branch provenance and
+the exact source Analysis/artifact; normal owner-origin completion remains
+supported and duplicate bot completion publication is excluded.
+This candidate requires human-controlled protected-main rollout before any
+live automatic-revalidation claim. It adds neither secrets nor Analysis writes.
 
 Reviewer sessions are outside this write-capable workflow path. A user starts
 each installed agent or reviewed deep link only after the deterministic result
@@ -87,7 +98,7 @@ retention and are evidence records, not permanent archives.
 
 ## Deployment boundary
 
-The MVP is one private GitHub.com repository with synthetic data. GitHub Actions
+The reference is a public GitHub.com repository with synthetic data. GitHub Actions
 are PR-triggered; the three reviewer sessions and Evidence Assembler are manual.
 Checked-in automation prompts are blocked setup/product-feedback templates, not
 live personal reviewer automations or automation-as-code. Cross-repository
@@ -106,5 +117,8 @@ accepted and the candidate was disabled.
 The app-first implementation places the synthetic API in `src/`, its tests in
 `tests/`, and retention configuration in `config/`. Private engine and CLI
 workspaces live in `packages/`; the plugin is installed separately from the
-`webmaxru/AgentProof` marketplace. Current repository settings and entitlement
-limitations are recorded in [GitHub setup](github-setup.md).
+`webmaxru/AgentProof` marketplace. Active no-bypass delivery ruleset `24293848`
+is verified on main; independent code-owner onboarding and deployment of the
+candidate workflow repair remain human prerequisites. The installed/candidate
+distinction and historical private-plan receipts are in
+[GitHub setup](github-setup.md).

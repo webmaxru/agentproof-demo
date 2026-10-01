@@ -1,5 +1,6 @@
-import { assertSha, githubRequest, readEvent, repositoryFromEnvironment } from "./github-api.mjs";
-import { createPendingGateCheck, loadDefaultBranchPullRequest } from "./gate-check.mjs";
+import { assertSha, readEvent, repositoryFromEnvironment } from "./github-api.mjs";
+import { loadDefaultBranchPullRequest } from "./gate-check.mjs";
+import { dispatchRevalidation } from "./dispatch-revalidation.mjs";
 import { isTrustedPullRequestAuthor, workflowRunUrlFromEnvironment } from "./workflow-helpers.mjs";
 
 const repository = repositoryFromEnvironment();
@@ -25,23 +26,10 @@ if (eventHeadSha !== liveHeadSha) {
   throw new Error("Pull request head changed before revalidation was queued");
 }
 
-const identity = await createPendingGateCheck({
+await dispatchRevalidation({
   repository,
   repositoryData,
   pullRequest,
   detailsUrl: workflowRunUrlFromEnvironment(),
   reason: `pull request ${String(event.action)}`,
 });
-await githubRequest(
-  `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/actions/workflows/agentproof-analyze.yml/dispatches`,
-  {
-    method: "POST",
-    body: {
-      ref: repositoryData.default_branch,
-      inputs: {
-        pr_number: String(identity.number),
-        expected_head_sha: identity.headSha,
-      },
-    },
-  },
-);
