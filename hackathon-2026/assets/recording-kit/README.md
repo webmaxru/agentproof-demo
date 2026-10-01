@@ -6,11 +6,20 @@ The repository's recording guide and live GitHub records remain authoritative.
 
 As of 2026-10-01 the reference repository is public and main has a verified
 active no-bypass ruleset. Protected CODEOWNERS names both `@webmaxru` and
-`@vibeprogrammer`; PR #4 is merged. PR #10's metadata refresh completed the
-native bot Analysis and explicit Publisher chain, but the batch failed for
-old-base PR #5/#6 after successful Analyses. The new old-base repair remains a
-candidate requiring human rollout. Draft PRs and illustrative media are not
-proof of the completed review/merge flow.
+`@vibeprogrammer`; PR #4 and old-base repair PR #11 are installed on
+`66058035adc0ca613f4d1fa5db6afc606327b7c0`. Native metadata and manual-batch
+publication completed, including the unchanged old-base subjects; issue #7
+is closed. The genuine scheduled run overlapped manual replacement Publishers,
+not an uninterrupted scheduler-only demonstration or a delivery-time guarantee.
+The SHA above is a dated rollout anchor, not a permanent checkout requirement;
+each capture must independently resolve the live protected default-branch tip.
+
+Use [the current prepared subjects](../../../demo/README.md): unsafe PR #5 and
+separate retention-only successor PR #12. PR #6 and its old dependency pass
+are historical. Capture the newest native result on each exact full head
+before recording. A separate successor does not prove same-PR stale decisions,
+human exceptions, independent approval, or merge availability. Draft PRs and
+illustrative media do not complete that lifecycle.
 
 | Asset                                   | Use                                                                                                            |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -37,9 +46,15 @@ python .\generate_assets.py --verify-only
 ```
 
 The deck uses Segoe UI; image generation can fall back to DejaVu Sans.
-`--verify-only` checks structure, slide bounds, dimensions, the permanent
-cue-card banner, duration/frame rate when the video exists, and file digests.
-It does not replace visual review or prove the live GitHub story.
+`--verify-only` checks structure, slide bounds, dimensions, the cue-card banner
+color, and duration/frame rate when the video exists, then **rewrites
+`asset-manifest.json` from the current files**. It is not a read-only verifier
+of the previously committed manifest and does not regenerate the deck, images,
+captions, timeline, or video. Use it to refresh the manifest after actual text
+changes; do not rebuild unchanged media merely to make timestamps newer.
+Independently compare each manifest hash and byte count with the exact committed
+Git blob (`git cat-file blob HEAD:<repo-relative-path>`), not a Windows working
+copy. Mechanical checks do not replace visual review or prove the live GitHub story.
 Text assets use LF line endings, matching `.gitattributes`, so their manifest
 digests survive commits and fresh checkouts on Windows as well as Linux.
 
@@ -55,6 +70,13 @@ Changes outside a reviewed recording-kit overlay are rejected:
 ```powershell
 node .\capture-state.mjs --pr <PR_NUMBER>
 ```
+
+For the prepared comparison, resolve PR #5 and PR #12 separately. Do not combine
+their repositories, PR numbers, heads, policy bases, or artifacts into one
+claimed decision chain. Historical PR #6 may be captured only with an explicit
+historical label, never as the current passing remediation. An initial receipt
+is a dated anchor, not a permanently current artifact/digest; resolve fresh
+native state on the exact head every time.
 
 The helper uses the saved `webmaxru` GitHub keyring identity, removing inherited
 `GH_TOKEN` and `GITHUB_TOKEN` only in its subprocess environment. It never
@@ -72,7 +94,7 @@ ID is never treated as a workflow-run ID.
 The completed publisher must agree with the native gate: a `failure` is expected
 for genuine blocking evidence and is never relabeled as a passing workflow.
 
-The candidate helper imports `validateNativePublisherRun` and the GET-only
+The installed helper imports `validateNativePublisherRun` and the GET-only
 `resolveTrustedWorkflowRevision` only from the clean protected orchestration
 checkout, never from the PR workflow tree or an arbitrary supplied SHA. It validates
 the registered active Publisher workflow ID/name/path, native repository/head
@@ -83,17 +105,18 @@ PR/body, final artifact, and latest current-head check after download. It does n
 a workflow event/context or claim to observe unexposed dispatch inputs.
 Native Publisher identity alone does not prove the new automatic bot handoff.
 
-**Installed versus candidate:** the old policy base
-`ce9f1b8e33a7bd58ab1b2eb40149070a356fd083` lacks the native validator; installed
-main `28f185f710848cf20a2c4c047f5499583c7fdcb2` lacks the new workflow-revision
-resolver. Neither is a compatible orchestration checkout for this candidate.
+**Current workflow versus historical policy base:** PR #11 installed the
+compatible helper and validators on protected main
+`66058035adc0ca613f4d1fa5db6afc606327b7c0`. The old policy base
+`ce9f1b8e33a7bd58ab1b2eb40149070a356fd083` lacks the native validator;
+historical main `28f185f710848cf20a2c4c047f5499583c7fdcb2` lacks the
+workflow-revision resolver. Neither is a compatible current orchestration checkout.
 The reviewed `b44e2e892945b6cecbbe6e08c8f8d8c2a3b04e6b` kit's successful
 legacy captures remain history, not a fallback verification of current
 explicit Publishers. The PR #4 helper's PR-base coupling is also not proof.
 Do not copy candidate workflow/evaluator scripts into a checkout to bypass
-the guard. After authorized human rollout installs the shared validators and
-workflows together, use the new protected default revision and fresh evidence,
-while preserving each subject's independently resolved policy base/head.
+the guard. Use the independently resolved current protected default revision
+and fresh evidence while preserving each subject's real policy base/head.
 
 For a compatible reviewed helper in an unmerged setup PR, use a clean,
 disposable checkout of the live protected default revision and copy only that reviewed commit's
@@ -112,10 +135,11 @@ and obtain a new capture; a main update does not itself advance a frozen PR's
 head or policy base. Keep unsafe/remediation heads frozen now. Separately,
 the strict up-to-date merge rule means the later human-recorded remediation transition must incorporate the
 then-current protected main without dropping its controls, then resolve the
-resulting full head/base and collect fresh evidence. Prepared PR #6's old head
-is not automatically that new up-to-date head. Its Fastify 5.12.1 audit is now
-historical, not current passing remediation. Include the reviewed current
-runtime/lock fix (5.12.5, now installed through PR #4) as well as the authorization-marker repair.
+resulting full head/base and collect fresh evidence. Prepared PR #12's separate
+head is not automatically that new up-to-date head. PR #6's Fastify 5.12.1 audit
+is historical, not current passing remediation. Include a currently patched
+runtime and refreshed lockfile, rerun the trusted production audit, and restore
+the authorization marker while retaining the intentional retention unknown.
 
 Every successful capture gets a new ignored `.agentproof\recording` directory.
 The downloaded evidence and `presenter-state.json` are a private, read-only

@@ -58,17 +58,22 @@ flowchart LR
 3. **Disposition:** never executes PR code. It authorizes the actor and command,
    then requests fresh evidence rather than trusting a canvas draft.
 4. **Revalidate:** requests fresh evidence periodically for open PRs. The
-   installed baseline's automatic publication gap remains tracked in issue #7.
+   configured cron is a request schedule, not a guaranteed delivery interval.
 
-The candidate repair in PR #4 uses the controller's existing actions-write
+The installed repairs in PR #4 and PR #11 use the controller's existing actions-write
 scope to receive an exact native Analysis ID, wait boundedly for that run and
 attempt, recheck the live subject/body, and explicitly dispatch the trusted
 default-branch Publisher. It releases gate concurrency without waiting for
 Publisher. The publisher validates native run/default-branch provenance and
 the exact source Analysis/artifact; normal owner-origin completion remains
 supported and duplicate bot completion publication is excluded.
-This candidate requires human-controlled protected-main rollout before any
-live automatic-revalidation claim. It adds neither secrets nor Analysis writes.
+Current protected orchestration is resolved independently of the immutable
+PR-base evaluator/policy. PR #11 is installed on protected main
+`66058035adc0ca613f4d1fa5db6afc606327b7c0`; native metadata/manual-batch
+publication is verified, including old-base subjects, and issue #7 is closed.
+The genuine scheduled run overlapped manual work, so uninterrupted
+scheduler-only proof remains a separate recording exercise.
+These repairs add neither secrets nor Analysis writes.
 
 Reviewer sessions are outside this write-capable workflow path. A user starts
 each installed agent or reviewed deep link only after the deterministic result
@@ -118,7 +123,8 @@ The app-first implementation places the synthetic API in `src/`, its tests in
 `tests/`, and retention configuration in `config/`. Private engine and CLI
 workspaces live in `packages/`; the plugin is installed separately from the
 `webmaxru/AgentProof` marketplace. Active no-bypass delivery ruleset `24293848`
-is verified on main; independent code-owner onboarding and deployment of the
-candidate workflow repair remain human prerequisites. The installed/candidate
-distinction and historical private-plan receipts are in
+is verified on main, both code owners are installed, and PR #4/PR #11 are merged.
+Actual recording-scenario dispositions, independent review, same-PR
+invalidation, and final recording remain human prerequisites. Current
+deployment and historical rollout/private-plan receipts are separated in
 [GitHub setup](github-setup.md).

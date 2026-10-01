@@ -8,22 +8,22 @@ and imports upstream snapshot `47fdeeb665d930a599a3530958b8e62325647810`.
 ## Current installed state: 2026-10-01
 
 Native repository/ruleset/branch reads confirm the installed state after the
-human merges of onboarding PR #9 and setup PR #4. The no-bypass delivery rules
-remain active. The follow-up old-base repair described below is a new candidate,
-not an agent-authorized deployment.
+human merges of onboarding PR #9, setup PR #4, and old-base repair PR #11.
+The no-bypass delivery rules remain active. Historical candidate and failed
+batch receipts below are retained as history, not current deployment blockers.
 
-| Item                        | Verified current value                                                                                                                                        |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Visibility                  | `public`, `private: false`                                                                                                                                    |
-| Protected main              | `protected: true`, `28f185f710848cf20a2c4c047f5499583c7fdcb2`                                                                                                 |
-| Ruleset                     | `24293848`, `AgentProof protected delivery`, `active`, target `~DEFAULT_BRANCH`                                                                               |
-| Required checks             | Strict `AgentProof / gate` and `Build, lint, and test`, both GitHub Actions app `15368`                                                                       |
-| Pull-request rules          | One approving code-owner review, last-push approval, stale-review dismissal, resolved threads; native extra approval for unattributed changes remains enabled |
-| Bypass / destructive pushes | No bypass actors; deletion and force pushes blocked                                                                                                           |
-| Actions                     | Same four selected full-SHA pins; default token `read`; automated review approval and broad GitHub-owned/verified allowances remain disabled                  |
-| Protected CODEOWNERS        | Both `@webmaxru` and `@vibeprogrammer`; an author still cannot independently approve their own PR                                                             |
-| Workflow repair             | PR #4 installed; PR #10 metadata refresh verified; batch old-base PR #5/#6 revalidation failed before Publisher dispatch                                      |
-| Runtime dependency          | Active root manifest and resolved installation are Fastify `5.12.5`; frozen PR #5/#6 dependencies are not changed by main's update                            |
+| Item                          | Verified current value                                                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Visibility                    | `public`, `private: false`                                                                                                                                    |
+| Protected-main rollout anchor | `protected: true`, `66058035adc0ca613f4d1fa5db6afc606327b7c0` observed on 2026-10-01, before this documentation refresh                                       |
+| Ruleset                       | `24293848`, `AgentProof protected delivery`, `active`, target `~DEFAULT_BRANCH`                                                                               |
+| Required checks               | Strict `AgentProof / gate` and `Build, lint, and test`, both GitHub Actions app `15368`                                                                       |
+| Pull-request rules            | One approving code-owner review, last-push approval, stale-review dismissal, resolved threads; native extra approval for unattributed changes remains enabled |
+| Bypass / destructive pushes   | No bypass actors; deletion and force pushes blocked                                                                                                           |
+| Actions                       | Same four selected full-SHA pins; default token `read`; automated review approval and broad GitHub-owned/verified allowances remain disabled                  |
+| Protected CODEOWNERS          | Both `@webmaxru` and `@vibeprogrammer`; an author still cannot independently approve their own PR                                                             |
+| Workflow repair               | PR #4 and PR #11 installed; native metadata and manual-batch publication verified, including unchanged old-base PR #5/#6; issue #7 closed                     |
+| Runtime dependency            | Active root manifest and resolved installation are Fastify `5.12.5`; frozen PR #5/#6 dependencies are not changed by main's update                            |
 
 Read-only commands used for the current state, after the authentication
 preamble below:
@@ -37,17 +37,79 @@ gh api repos/webmaxru/agentproof-demo/branches/main
 
 The ruleset and effective branch rules are real enforcement facts. They are
 not evidence of the recording scenarios' human decisions. PR #9 merged at
-`2026-10-01T10:27:04Z`; PR #4 merged at `2026-10-01T10:36:15Z`.
-PR #5, PR #6, and smoke PR #10 remain **DRAFT** with their heads unchanged.
-Draft-disabled Merge is not a required-check or independent-review test.
+`2026-10-01T10:27:04Z`; PR #4 merged at `2026-10-01T10:36:15Z`; PR #11 merged
+at `2026-10-01T12:16:05Z`. Protected-main
+[CI 36860631376](https://github.com/webmaxru/agentproof-demo/actions/runs/36860631376)
+completed successfully on `66058035adc0ca613f4d1fa5db6afc606327b7c0`.
+Do not repeat historical rollout/onboarding steps or change the frozen subjects.
+This SHA is a dated rollout receipt, not a permanently required checkout.
+Resolve the live protected default-branch name/tip before every capture,
+including after this fix merges, while keeping the PR's real policy base separate.
 
-The new repair still requires independent human review and protected-main
-rollout. Preserve both installed owners, all policy thresholds, and all active
-controls. Do not reopen merged PR #4 or repeat its earlier onboarding steps.
-After the old-base repair is installed and verified, a human operator may
-ready recording PR #5 for actual review shots, then wait for fresh evidence.
-No ready transition, exception, approval, merge, or frozen-head change is part
-of this implementation.
+### Installed publication and remaining recording boundaries
+
+The repaired native metadata path completed
+[controller 36867494671](https://github.com/webmaxru/agentproof-demo/actions/runs/36867494671)
+-> [Analysis 36867512672](https://github.com/webmaxru/agentproof-demo/actions/runs/36867512672)
+-> [Publisher 36867578532](https://github.com/webmaxru/agentproof-demo/actions/runs/36867578532).
+Manual [batch 36904162255](https://github.com/webmaxru/agentproof-demo/actions/runs/36904162255)
+published completed, correctly blocking evidence for the unchanged PR #5/#6
+heads. Missing publication and real blocking findings are different outcomes.
+The [issue #7 closure receipt](https://github.com/webmaxru/agentproof-demo/issues/7#issuecomment-5937413029)
+records the deployed repair and the earlier successful manual batch.
+
+Genuine [scheduled run 36868318289](https://github.com/webmaxru/agentproof-demo/actions/runs/36868318289)
+started at `2026-10-01T13:23:19Z`; its controllers succeeded, but overlapping
+manual work superseded two Publishers. This is not an uninterrupted
+scheduler-only demonstration. No later scheduled run was observed in the
+2026-10-01 refresh; a configured six-hour cron is not a delivery guarantee.
+Human comment/edit/delete/expiry and same-PR stale-head exercises remain
+separate work in issues #2/#3, not consequences of closing the implementation defect.
+
+The [active scenario guide](../demo/README.md) identifies frozen unsafe PR #5,
+the current separate retention-only successor PR #12, and historical PR #6 by
+their complete head SHAs. PR #12 was prepared from protected main and removes
+only `deletionMethod`; it preserves Fastify 5.12.5, the authorization marker,
+owners, controls, and policy. PR #5, PR #6, smoke PR #10, and PR #12 remain
+**DRAFT**. A separate prepared successor does not demonstrate same-PR
+invalidation, a human disposition, independent review, or merge availability.
+
+Use the newest native result for the actual PR/base/head before each take.
+Dated runs and digests below are receipts, not permanently current presenter
+state. A human must ready the recording PR for review shots and wait for its
+fresh check. Draft-disabled Merge is not a required-check or review test.
+No readiness transition, exception, approval, merge, or frozen-head change is
+performed by this documentation or the recording kit.
+
+### Initial successor receipt (2026-10-01)
+
+Draft [PR #12](https://github.com/webmaxru/agentproof-demo/pull/12), head
+`9a0cb79cfc19b30bc32b858ddf8e4058a5367251`, has base and initial protected
+workflow revision `66058035adc0ca613f4d1fa5db6afc606327b7c0`.
+Its one-line diff removes `deletionMethod` from `config/data-handling.yml`.
+The initial owner-origin publication produced the following dated receipt;
+it is not the later controller refresh or same-PR human lifecycle.
+
+| Native record                                                                                 | Initial result                                                                                                                            |
+| --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| [CI 36921567044](https://github.com/webmaxru/agentproof-demo/actions/runs/36921567044)        | `Build, lint, and test` success on the exact head                                                                                         |
+| [Analysis 36921567200](https://github.com/webmaxru/agentproof-demo/actions/runs/36921567200)  | Successful `pull_request_target`, attempt 1                                                                                               |
+| [Publisher 36921632701](https://github.com/webmaxru/agentproof-demo/actions/runs/36921632701) | `workflow_run` on protected main, attempt 1; expected blocking workflow status after successful provenance, upload, and check publication |
+| [Gate 110569112500](https://github.com/webmaxru/agentproof-demo/runs/110569112500)            | Failure solely for `AP-POL-RETENTION-001` unknown; 5 pass, 0 fail, 1 unknown, 0 exception                                                 |
+| Final artifact                                                                                | `11192151474`, `agentproof-evidence-pr-12-9a0cb79cfc19b30bc32b858ddf8e4058a5367251`                                                       |
+| Generated / evaluated                                                                         | `2026-10-01T20:27:31.214Z`; no dispositions or diagnostics; `validUntil: null`                                                            |
+| Verified canonical evidence SHA-256                                                           | `1991818fa7c24e2f375677dfe5e032f4d29a6a7781babd594298e3e2f109a1d0`                                                                        |
+| Protected policy SHA-256                                                                      | `e410fd2296d229c99fb80de6422143b3baaf0f4a8174b604b7c1b953b2bf6c4f`                                                                        |
+
+The successor's recorded `npm audit --omit=dev --audit-level=high --json`
+at `2026-10-01T20:24:52Z` returned exit 0: no high/critical findings and one
+allowed moderate `fast-uri` finding. The initial native audit agrees; this
+is not a vulnerability-free or permanent-patch claim.
+`validUntil: null` means no accepted-exception expiry, not perpetual freshness.
+Retain this initial receipt without rewriting it after refreshes. Before a
+recording or decision, resolve the newest native check/artifact and verify
+repository, PR, full base/head, policy, all finding source SHAs, and canonical
+digest again with the trusted helper.
 
 ## Historical runtime audit and installed narrow remediation
 
@@ -193,7 +255,7 @@ Each was checked with
 Analysis installs only **base-revision** dependencies with `npm ci
 --ignore-scripts`. It stages the subject as data, uses trusted Vitest and
 generated `tests/**/*.test.ts` / `src/**/*.ts` selection, and audits the subject
-root lockfile. The old-base repair candidate separates current protected orchestration/core
+root lockfile. The installed old-base repair separates current protected orchestration/core
 validation from the immutable PR-base evaluator and policy. Neither publisher
 checkout installs subject dependencies or executes PR package scripts/configuration.
 Retention comes from root `config/data-handling.yml`.
@@ -212,14 +274,14 @@ In **Settings → Actions → General**:
 The checked-in workflows request job-specific permissions. Organization policy
 may further restrict them.
 
-Installed flow from PR #4 (the remaining old-base gap is tracked in issue #7):
+Installed flow from PR #4 and PR #11 (the implementation defect in issue #7 is closed):
 
 | Workflow                 | Trigger                                                         | Writes                                                 |
 | ------------------------ | --------------------------------------------------------------- | ------------------------------------------------------ |
 | `AgentProof Analysis`    | PR opened/synchronized; trusted manual dispatch                 | Raw artifact only; repository/PR read                  |
 | `AgentProof Publish`     | Non-controller analysis completion or exact controller dispatch | Required check, one PR summary, final artifact         |
 | `AgentProof Disposition` | PR comment create/edit/delete; PR metadata refresh              | Invalidates and dispatches current-head analysis       |
-| `AgentProof Revalidate`  | Every six hours/manual/repository dispatch                      | Dispatches Analysis, then exact Publisher for open PRs |
+| `AgentProof Revalidate`  | Six-hour cron request/manual/repository dispatch                | Dispatches Analysis, then exact Publisher for open PRs |
 
 Applied and read back before initial workflow publication:
 
@@ -300,13 +362,17 @@ branch rules and `protected: true` were read back. The earlier private-plan
 substituted. Both installed code owners remain named; actual scenario approval
 must still come from a distinct authorized human.
 
-## Automatic-refresh rollout and remaining old-base repair
+## Historical automatic-refresh rollout before PR #11
+
+**Historical record:** the candidate state and partial batch failure in this
+section precede the human merge of PR #11. They are not current rollout tasks;
+the installed result and remaining recording boundaries are recorded above.
 
 Issue [#7](https://github.com/webmaxru/agentproof-demo/issues/7) records a
 historical bot-dispatched Analysis with no following Publisher. The original
 handoff repair was installed by the human merge of PR #4. The receipts below
-distinguish the verified same-base path from the newly confirmed old-base
-failure; issue #7 remains open.
+distinguish the then-verified same-base path from the subsequently confirmed
+old-base failure. Issue #7 remained open at that stage.
 
 ### Installed PR #4 and verified rollout step 5
 
@@ -348,7 +414,7 @@ remains `830d2589cee7ab9b2db4b3afa1c93f25ca2b6c73`. Neither is advanced to
 hide the defect. Fresh publication is expected to remain blocking for their
 real findings, including PR #6's now-vulnerable dependency, not turn them green.
 
-### New candidate and human rollout boundary
+### Historical candidate and human rollout boundary
 
 The follow-up candidate independently resolves the native default-branch
 workflow revision, anchors genuine workflow context to that revision, and
@@ -425,12 +491,15 @@ missing `yaml` package; package manifests and lockfile were not changed.
 Native candidate CI is recorded on the new scoped PR, not substituted for
 post-rollout execution of the repaired privileged workflows.
 
-Keep issue #7 open after candidate publication and human merge until actual
-old-base bot Analysis and explicit Publisher runs produce completed,
-correctly blocking checks/artifacts on the unchanged heads. Verify the other
-comment/batch paths separately; one successful matrix job is not full batch
-success. Record both the deployed workflow revision and the subject's
-independently resolved base/head/policy/evidence.
+The historical rollout requirement was to keep issue #7 open until actual
+old-base bot Analysis and explicit Publisher runs produced completed,
+correctly blocking checks/artifacts on the unchanged heads. That implementation
+requirement is now satisfied and the issue is closed. Other human
+comment/lifecycle and uninterrupted scheduler-only exercises remain separate;
+one successful matrix job is not full batch success. Record both the deployed
+workflow revision and the subject's independently resolved base/head/policy/evidence.
+
+### Current recording transition boundary
 
 The strict required-check rule also requires branches to incorporate current
 main before merge. That is distinct from revalidating an older immutable
@@ -438,9 +507,11 @@ evidence base. A main update does not itself advance these frozen PR heads/bases
 Do not advance frozen PR #5/#6 now or update the unsafe PR before its first
 recorded human disposition. During the later authorized recorded transition,
 incorporate the then-current protected main while preserving its owners,
-controls, workflows, and reviewed runtime dependency/lock fixes. Prepared remediation head
-`830d2589cee7ab9b2db4b3afa1c93f25ca2b6c73` is not automatically the final
-up-to-date unsafe-PR head, and its Fastify `5.12.1` resolution is now affected.
+controls, workflows, and reviewed runtime dependency/lock fixes. Current
+prepared PR #12 head `9a0cb79cfc19b30bc32b858ddf8e4058a5367251` is not
+automatically the final up-to-date unsafe-PR head. PR #6 head
+`830d2589cee7ab9b2db4b3afa1c93f25ca2b6c73` remains historical, with its
+Fastify `5.12.1` resolution affected by advisory drift.
 The later recorded head must include the current reviewed dependency patch
 as well as the prepared authorization-marker restoration. Resolve the actual
 resulting full base/head and collect new evidence; neither old-base artifacts
@@ -472,18 +543,19 @@ prior approval, independent approval, or merge protection are **HUMAN NOT
 PERFORMED** until an authorized human actually exercises them. Automated unit
 tests of those semantics are not a substitute for live acceptance.
 
-The unsafe recording PR stays at its first unsafe head. A separate remediation
-PR is prepared from that head, restoring the safe dependency and AP-ID marker
-while retaining incomplete retention. That separate PR does not itself
+The unsafe recording PR stays at its first unsafe head. The current separate
+successor PR #12 is prepared from protected main, retaining the reviewed
+dependency and AP-ID marker while removing only `deletionMethod`. Historical
+PR #6 remains unchanged. The separate successor does not itself
 demonstrate same-PR stale disposition or stale approval. A human must record the
 actual transition later. Never fabricate prior approval for a dismissal shot.
 
-The upstream kit migration is a separate, unmerged human-review boundary.
-Before installing its `main` marketplace, a human must merge that migration and
-confirm its source entries point to `webmaxru/AgentProof`. An older installed
-plugin in another session is not validation of the new kit.
+The upstream kit and its installation are a separate boundary. Before using
+its `main` marketplace, confirm its reviewed source entries point to
+`webmaxru/AgentProof` and validate the installed revision. An older installed
+plugin in another session is not validation of the current kit.
 
-## Live results and recording handoff
+## Historical baseline and recording receipts
 
 ### Published baseline
 
@@ -524,9 +596,11 @@ enforcement by itself. The initial automated
 receipt is also preserved in
 [recording readiness](https://github.com/webmaxru/agentproof-demo/issues/2#issuecomment-5921098037).
 
-### PR evidence
+### Historical PR evidence (2026-09-30)
 
-These are actual GitHub results observed on `2026-09-30`, not fixture output.
+These are actual GitHub results observed on `2026-09-30`, not fixture output
+or current dependency observations. In particular, PR #6's older pass is
+historical; the current prepared successor is PR #12, not a relabeling of these receipts.
 Every subject below has the same frozen base and policy identity recorded above.
 The unsafe and remediation heads remain fixed. The setup row deliberately
 records its **initial** positive-path head: later documentation/capture-helper
@@ -560,12 +634,13 @@ The unsafe artifact contains exactly these unresolved findings:
   application behavior was removed.
 - `AP-POL-RETENTION-001`: **unknown**, only `deletionMethod` is missing.
 
-Remediation is a direct child of the frozen unsafe commit, targeting `main`.
-Its manifest, lockfile, runtime source, and complete tests match the safe
-baseline exactly. Its only diff against `main` is the missing `deletionMethod`.
-Dependency and AP-ID findings therefore pass in real evidence, but retention
-remains **unknown** and blocking. No exception was accepted to create either
-result.
+The historical PR #6 remediation was a direct child of the frozen unsafe
+commit, targeting `main`. Its manifest, lockfile, runtime source, and complete
+tests matched the then-safe baseline exactly. Its only diff against that
+baseline was the missing `deletionMethod`. Dependency and AP-ID findings
+passed at that observation, while retention remained **unknown** and blocking.
+No exception was accepted to create either result. Subsequent advisory drift
+invalidated the dependency-pass claim for current use; these receipts remain unchanged.
 
 #### Immutable artifact receipts
 
@@ -647,7 +722,7 @@ SHA to equal the frozen PR policy base. Neither it nor the legacy
 `workflow_run`-only helper verifies a fresh current-default explicit Publisher
 for an old-base PR.
 
-The new candidate uses a clean checkout of the **current protected default
+The installed PR #11 helper uses a clean checkout of the **current protected default
 workflow revision**, independently verified through native branch and git-ref
 GETs, for its core parser and native-only validators. It binds native app
 `15368`, the exact check header/trailing Publisher footer, registered workflow,
@@ -656,29 +731,33 @@ digest. Policy is read as data at the real PR base; evidence and every finding
 retain the full subject SHAs. It rechecks the checkout/default branch,
 subject/body, native Publisher attempt, artifact, and latest gate after download.
 It neither fabricates event/context nor claims unexposed Analysis dispatch inputs.
-The installed `28f185f710848cf20a2c4c047f5499583c7fdcb2` checkout lacks the new
-shared workflow-revision resolver, so this candidate still requires human
-rollout. Do not overlay workflow/evaluator scripts to bypass that guard.
+The historical `28f185f710848cf20a2c4c047f5499583c7fdcb2` checkout lacks the
+shared workflow-revision resolver. The PR #11 rollout anchor
+`66058035adc0ca613f4d1fa5db6afc606327b7c0` includes the compatible installed
+helper and validators; later captures must use the independently resolved
+live protected tip, not this fixed anchor. Do not overlay workflow/evaluator
+scripts to bypass the guard.
 Only a reviewed recording-kit overlay is permitted.
 Follow the
 [recording-kit overlay procedure](../hackathon-2026/assets/recording-kit/README.md#refresh-presenter-evidence-before-recording)
-after the matching shared orchestration is installed. This preserves the
+only when a reviewed recording-kit overlay is needed. This preserves the
 frozen subject while independently trusting current protected orchestration.
 
 #### Current remaining human and rollout checks
 
-| Check                                                                          | Actual status                                                                                                             |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| Ruleset / branch protection and enforced merge behavior                        | **NATIVE RULES VERIFIED** on 2026-10-01; interactive review/merge cases remain unperformed; draft state is not proof      |
-| Deploy and verify old-base repair                                              | **NEW CANDIDATE, NOT DEPLOYED**; PR #10 refresh verified, PR #5/#6 batch jobs failed; issue #7 remains open               |
-| Obtain independent recording-scenario approval                                 | **HUMAN NOT PERFORMED** for these scenarios; both protected code owners are now installed                                 |
-| Submit, edit, delete, or expire a real eligible acceptance                     | **HUMAN NOT PERFORMED**; no exception comments posted                                                                     |
-| Advance the same unsafe PR after recording its first exception                 | **HUMAN NOT PERFORMED**; unsafe head remains frozen, separate remediation is not this demonstration                       |
-| Dismiss an actual prior approval after a head update                           | **HUMAN NOT PERFORMED**; no prior approval was fabricated                                                                 |
-| Live policy-tampering / overlapping-publication acceptance exercise            | **NOT PERFORMED LIVE**; trusted-base paths and automated rejection tests were checked, not represented as live acceptance |
-| Fresh advisory specialists / assembled reviewer fragments                      | **NOT RUN**; no generated notes represented as specialist output                                                          |
-| Upstream kit migration merge and newly installed `main` marketplace validation | **HUMAN NOT PERFORMED**; old installed plugin is not evidence of the new kit                                              |
-| Live footage, narration, final master, and privacy sign-off                    | **HUMAN NOT PERFORMED**; precomputed assets remain labeled                                                                |
+| Check                                                               | Actual status                                                                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Ruleset / branch protection and enforced merge behavior             | **NATIVE RULES VERIFIED** on 2026-10-01; interactive review/merge cases remain unperformed; draft state is not proof      |
+| Deploy and verify old-base repair                                   | **INSTALLED AND VERIFIED** through PR #11; native metadata/manual-batch publication completed; issue #7 closed            |
+| Uninterrupted scheduler-only publication                            | **NOT YET DEMONSTRATED**; the genuine 13:23 UTC run overlapped manual replacement Publishers                              |
+| Obtain independent recording-scenario approval                      | **HUMAN NOT PERFORMED** for these scenarios; both protected code owners are now installed                                 |
+| Submit, edit, delete, or expire a real eligible acceptance          | **HUMAN NOT PERFORMED**; no exception comments posted                                                                     |
+| Advance the same unsafe PR after recording its first exception      | **HUMAN NOT PERFORMED**; unsafe head remains frozen, separate remediation is not this demonstration                       |
+| Dismiss an actual prior approval after a head update                | **HUMAN NOT PERFORMED**; no prior approval was fabricated                                                                 |
+| Live policy-tampering / overlapping-publication acceptance exercise | **NOT PERFORMED LIVE**; trusted-base paths and automated rejection tests were checked, not represented as live acceptance |
+| Fresh advisory specialists / assembled reviewer fragments           | **NOT RUN**; no generated notes represented as specialist output                                                          |
+| Newly installed `main` marketplace validation                       | **NOT PERFORMED IN THIS REFRESH**; an old installed plugin is not evidence of the current kit                             |
+| Live footage, narration, final master, and privacy sign-off         | **HUMAN NOT PERFORMED**; precomputed assets remain labeled                                                                |
 
 Tracking issues:
 
