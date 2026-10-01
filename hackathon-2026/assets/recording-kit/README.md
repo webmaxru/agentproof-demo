@@ -4,6 +4,11 @@ These are **precomputed production aids, not live evidence**. They contain no
 real reviewer output, accepted exception, PR approval, or privacy sign-off.
 The repository's recording guide and live GitHub records remain authoritative.
 
+As of 2026-10-01 the reference repository is public and main has a verified
+active no-bypass ruleset. Independent code-owner onboarding, human decisions,
+and rollout of the candidate automatic-refresh repair remain pending. Draft
+PRs and illustrative media are not proof of the completed review/merge flow.
+
 | Asset                                   | Use                                                                                                            |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `agentproof-recording-deck.pptx`        | Three editable 16:9 slides: trust gap, control loop, honest boundaries. Speaker notes explain allowed claims.  |
@@ -58,7 +63,25 @@ policy. A native check-page ID is never treated as a workflow-run ID.
 The completed publisher must agree with the native gate: a `failure` is expected
 for genuine blocking evidence and is never relabeled as a passing workflow.
 
-If the reviewed capture fix is still in the unmerged setup PR, use a clean,
+The candidate helper imports `validateNativePublisherRun` only from the clean,
+exact protected-base checkout, never from the PR workflow tree. It validates
+the registered active Publisher workflow ID/name/path, native repository/head
+repository, current default branch, trusted workflow SHA, exact run/attempt,
+and completed gate conclusion for both native ingress types. It rechecks the
+native run/attempt, live PR/body, and check after download. It does not invent
+a workflow event/context or claim to observe unexposed dispatch inputs.
+Native Publisher identity alone does not prove the new automatic bot handoff.
+
+**Installed versus candidate:** frozen baseline
+`ce9f1b8e33a7bd58ab1b2eb40149070a356fd083` lacks the new native validator.
+This candidate helper deliberately rejects that base. For its installed
+legacy `workflow_run` captures, use the previously reviewed kit at
+`b44e2e892945b6cecbbe6e08c8f8d8c2a3b04e6b`. Do not copy candidate workflow
+scripts into the base checkout to bypass the guard. After authorized human
+rollout installs the shared validators and workflows together, use the new
+helper with the newly resolved protected base and fresh evidence.
+
+For a compatible reviewed helper in an unmerged setup PR, use a clean,
 disposable checkout of the live PR base and copy only that reviewed commit's
 recording kit into it. From the repository root, after fetching that commit:
 
@@ -69,6 +92,12 @@ git restore --source "<REVIEWED_KIT_COMMIT_SHA>" --worktree -- .\hackathon-2026\
 Keep the evaluator, policy, package files, and workflow scripts at the base
 revision. Do not run the capture from the candidate PR head. This local asset
 overlay does not merge the PR, change `main`, or turn the snapshot into approval.
+With the strict up-to-date rule, later human onboarding/repair merges change
+the base and invalidate old captures. Keep unsafe/remediation heads frozen
+now. The later human-recorded remediation transition must incorporate the
+then-current protected main without dropping its controls, then resolve the
+resulting full head/base and collect fresh evidence. Prepared PR #6's old head
+is not automatically that new up-to-date head.
 
 Every successful capture gets a new ignored `.agentproof\recording` directory.
 The downloaded evidence and `presenter-state.json` are a private, read-only

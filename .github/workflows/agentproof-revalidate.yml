@@ -42,7 +42,7 @@ jobs:
       - discover
     if: needs.discover.outputs.pull_requests != '[]'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 25
     permissions:
       actions: write
       checks: write
@@ -63,7 +63,7 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
 
-      - name: Invalidate gate and dispatch analysis
+      - name: Invalidate gate and dispatch bounded revalidation
         env:
           EXPECTED_HEAD_SHA: ${{ matrix.pull_request.head_sha }}
           GITHUB_TOKEN: ${{ github.token }}

@@ -16,7 +16,8 @@ import {
   isGitHubActionsCheckRun,
   sanitizeMarkdownCell,
   truncateUtf8,
-  validateLivePullRequest,
+  validateCompletedAnalysisRun,
+  validateEvidenceHandoff,
   workflowRunUrlFromEnvironment,
 } from "./workflow-helpers.mjs";
 
@@ -37,18 +38,48 @@ const pullRequestNumber = assertPositiveInteger(evidence.pullRequestNumber, "pul
 const headSha = assertSha(evidence.headSha, "head SHA");
 const baseSha = assertSha(evidence.baseSha, "base SHA");
 const prefix = `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}`;
+const expectedRunId = assertPositiveInteger(process.env.EXPECTED_RUN_ID, "EXPECTED_RUN_ID");
+const expectedRunAttempt = assertPositiveInteger(
+  process.env.EXPECTED_RUN_ATTEMPT,
+  "EXPECTED_RUN_ATTEMPT",
+);
+if (!process.env.METADATA_PATH || !process.env.RAW_EVIDENCE_PATH) {
+  throw new Error("METADATA_PATH and RAW_EVIDENCE_PATH are required");
+}
+const [metadata, rawEvidence] = await Promise.all([
+  readFile(process.env.METADATA_PATH, "utf8").then(JSON.parse),
+  readFile(process.env.RAW_EVIDENCE_PATH, "utf8").then(JSON.parse),
+]);
+if (assertSha(metadata.baseSha, "metadata base SHA") !== baseSha) {
+  throw new Error("Final evidence policy base does not match analysis metadata");
+}
 
 async function requireCurrentPullRequest() {
-  const [repositoryData, pullRequest] = await Promise.all([
+  const [repositoryData, pullRequest, analysisRun, analysisWorkflow] = await Promise.all([
     githubRequest(prefix),
     githubRequest(`${prefix}/pulls/${pullRequestNumber}`),
+    githubRequest(`${prefix}/actions/runs/${expectedRunId}`),
+    githubRequest(`${prefix}/actions/workflows/agentproof-analyze.yml`),
   ]);
-  validateLivePullRequest({
+  validateCompletedAnalysisRun({
+    run: analysisRun,
+    workflow: analysisWorkflow,
+    repository: repositoryData,
+    expectedRunId,
+    expectedRunAttempt,
+  });
+  validateEvidenceHandoff({
+    metadata,
+    rawEvidence,
+    expected: {
+      pullRequestNumber,
+      headSha,
+      artifactName: process.env.EXPECTED_ARTIFACT_NAME,
+      runId: expectedRunId,
+      serverUrl: process.env.GITHUB_SERVER_URL,
+    },
     repository: repositoryData,
     pullRequest,
-    expectedPullRequestNumber: pullRequestNumber,
-    expectedHeadSha: headSha,
-    expectedBaseSha: baseSha,
   });
 }
 

@@ -17,6 +17,14 @@ OS-temporary staging, provider ownership, and root/nested runtime regressions.
 This implementation keeps its expense-specific policy/AP-ID together. It does
 not merge or approve the upstream PR.
 
+The candidate automatic-refresh repair imports source commit
+`8b7f5c5de64a66c24a4d24e928355130757e38f0`, plus the native Publisher-validator
+extraction from `95f68dc2e5284348cbb24b7d8391946aa9305b96`. Source workflow
+templates were mapped to this application's active `.github/workflows`.
+This is a reviewable PR #4 change, not a deployment to protected `main`.
+Analysis isolation, application-specific AP-ID, policy, thresholds, action
+pins, and dependency manifests remain unchanged.
+
 ## Mapping
 
 | Source snapshot                                                      | Reference implementation                                                             |
@@ -45,8 +53,10 @@ automation is enabled by this migration.
 
 Current GitHub commands, runs, head SHAs, policy/artifact digests, settings, and
 human-only gaps are recorded separately in [GitHub setup](github-setup.md).
-The private-plan ruleset and branch-protection APIs returned HTTP 403. A desired
-ruleset file is not enforcement, and the owner's review is not independent.
+The private-plan APIs returned HTTP 403 on 2026-09-30. On 2026-10-01 the repository
+became public and native reads verified active delivery ruleset `24293848` and
+protected `main`. Those are separate dated observations; a checked-in ruleset
+alone is not enforcement, and the owner's review is still not independent.
 
 ## Recording material
 

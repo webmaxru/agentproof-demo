@@ -11,9 +11,11 @@ only and is permanently labeled `PRECOMPUTED / NOT LIVE`.
 
 **Conditional closing:** the green retention gate requires a real authorized
 human exception; independent approval requires a different authorized human.
-The private repository currently lacks ruleset/branch-protection entitlement.
-Omit merge-enforcement claims until that prerequisite is resolved and tested.
-Approval-dismissal footage also requires a genuine prior independent approval.
+The public repository now has verified active no-bypass main protection, but
+independent code-owner onboarding and the automatic-refresh repair's human
+rollout remain pending. Current PRs are draft; do not use their disabled Merge
+button as proof of review enforcement. Approval-dismissal footage also
+requires a genuine prior independent approval.
 See [the actual setup record](../docs/github-setup.md), not historical media,
 for the state available to record.
 
@@ -184,8 +186,8 @@ head SHA. Transition to the independent reviewer profile and show approval.
 > repository protections.
 
 **Edit note:** Show merge availability only if protection enforcement was
-actually demonstrated. Otherwise disclose the private-plan blocker and leave
-the merge action untouched.
+actually demonstrated on an appropriate human-readied PR. Otherwise disclose
+the outstanding human/rollout prerequisites and leave the merge action untouched.
 
 ## 2:32–2:43 — State the enterprise boundary
 

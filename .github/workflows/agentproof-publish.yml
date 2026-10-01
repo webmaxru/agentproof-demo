@@ -6,6 +6,16 @@ on:
       - AgentProof Analysis
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      analysis_run_id:
+        description: Exact native controller-dispatched Analysis run ID
+        required: true
+        type: string
+      analysis_run_attempt:
+        description: Exact native Analysis run attempt
+        required: true
+        type: string
 
 permissions: {}
 
@@ -13,9 +23,13 @@ jobs:
   provenance:
     name: Validate analysis provenance
     if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      (github.event.workflow_run.event == 'pull_request_target' ||
-       github.event.workflow_run.event == 'workflow_dispatch')
+      (github.event_name == 'workflow_dispatch' &&
+       github.ref_name == github.event.repository.default_branch) ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       (github.event.workflow_run.event == 'pull_request_target' ||
+        (github.event.workflow_run.event == 'workflow_dispatch' &&
+         github.event.workflow_run.actor.id != 41898282)))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -27,6 +41,7 @@ jobs:
       head_sha: ${{ steps.provenance.outputs.head_sha }}
       pr_number: ${{ steps.provenance.outputs.pr_number }}
       run_id: ${{ steps.provenance.outputs.run_id }}
+      run_attempt: ${{ steps.provenance.outputs.run_attempt }}
     steps:
       - name: Check out trusted provenance validator
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -61,6 +76,11 @@ jobs:
       RAW_EVIDENCE_PATH: ${{ github.workspace }}/.agentproof/incoming/raw-evidence.json
       DISPOSITIONS_PATH: ${{ github.workspace }}/.agentproof/dispositions.json
       FINAL_EVIDENCE_PATH: ${{ github.workspace }}/.agentproof/final-evidence.json
+      EXPECTED_ARTIFACT_NAME: ${{ needs.provenance.outputs.artifact_name }}
+      EXPECTED_HEAD_SHA: ${{ needs.provenance.outputs.head_sha }}
+      EXPECTED_PR_NUMBER: ${{ needs.provenance.outputs.pr_number }}
+      EXPECTED_RUN_ID: ${{ needs.provenance.outputs.run_id }}
+      EXPECTED_RUN_ATTEMPT: ${{ needs.provenance.outputs.run_attempt }}
     steps:
       - name: Check out trusted publisher bootstrap
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -81,10 +101,6 @@ jobs:
       - name: Validate evidence metadata and live pull request
         id: metadata
         env:
-          EXPECTED_ARTIFACT_NAME: ${{ needs.provenance.outputs.artifact_name }}
-          EXPECTED_HEAD_SHA: ${{ needs.provenance.outputs.head_sha }}
-          EXPECTED_PR_NUMBER: ${{ needs.provenance.outputs.pr_number }}
-          EXPECTED_RUN_ID: ${{ needs.provenance.outputs.run_id }}
           GITHUB_TOKEN: ${{ github.token }}
         run: node bootstrap/.github/scripts/read-metadata.mjs
 

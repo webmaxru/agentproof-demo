@@ -63,8 +63,26 @@ narrate three personal reviewer automations; the working sequence uses three
 isolated, manually started, read-only sessions.
 
 See [current GitHub setup](../../docs/github-setup.md) for this repository's
-actual runs and protection entitlement. Do not record merge enforcement or
-independent approval until those human/plan prerequisites are satisfied.
+actual runs and installed-versus-candidate state. Public main now has a
+verified active no-bypass ruleset. Independent code-owner onboarding, real
+review, and protected-base deployment of the candidate refresh repair remain
+pending. Keep the frozen scenario heads/drafts unchanged; draft-disabled Merge
+is not a check-enforcement test. Do not narrate automatic refresh as repaired
+before a real default-branch run verifies it.
+
+The installed strict check rule requires an up-to-date branch. Later human
+CODEOWNERS onboarding and repair rollout will advance main, invalidating these
+old-base captures. Keep current PR #5/#6 heads frozen now. After the first
+recorded disposition, the human-recorded remediation transition must include
+the then-current protected main without losing its owners or controls; the
+prepared PR #6 head is not automatically the new PR #5 head. Resolve the
+resulting full SHA/base and collect fresh evidence before further decisions.
+
+The human operator must mark setup PR #4 ready before requesting human review.
+After the protected-main rollout, mark recording PR #5 ready before relying on
+independent approval or merge-availability UI. This does not advance its head,
+but it triggers revalidation; wait for the repaired current-head check. These
+are later operator steps, not agent changes to the current drafts.
 
 ## T-24 hours
 

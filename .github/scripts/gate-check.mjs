@@ -23,13 +23,10 @@ export async function loadDefaultBranchPullRequest(repository, pullRequestNumber
   return { repositoryData, pullRequest };
 }
 
-export async function createPendingGateCheck({
-  repository,
-  repositoryData,
-  pullRequest,
-  detailsUrl,
-  reason,
-}) {
+export async function createPendingGateCheck(
+  { repository, repositoryData, pullRequest, detailsUrl, reason },
+  request = githubRequest,
+) {
   const identity = validateLivePullRequest({
     repository: repositoryData,
     pullRequest,
@@ -40,7 +37,7 @@ export async function createPendingGateCheck({
     reason,
     now: new Date(),
   });
-  const created = await githubRequest(
+  const created = await request(
     `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}/check-runs`,
     { method: "POST", body: payload },
   );
