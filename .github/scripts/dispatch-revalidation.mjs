@@ -3,6 +3,7 @@ import { assertPositiveInteger, assertSha, githubRequest } from "./github-api.mj
 import { createPendingGateCheck } from "./gate-check.mjs";
 import {
   isControllerAnalysis,
+  resolveTrustedWorkflowRevision,
   validateAnalysisRunIdentity,
   validateNativeAnalysisRun,
   validateUnchangedPullRequest,
@@ -12,7 +13,14 @@ export const ANALYSIS_WAIT_MS = 20 * 60 * 1000;
 const POLL_INTERVAL_MS = 10_000;
 
 export async function dispatchRevalidation(
-  { repository, repositoryData, pullRequest, detailsUrl, reason },
+  {
+    repository,
+    repositoryData,
+    pullRequest,
+    detailsUrl,
+    reason,
+    workflowSha = process.env.GITHUB_WORKFLOW_SHA,
+  },
   { request = githubRequest, sleep = delay, now = Date.now } = {},
 ) {
   const identity = await createPendingGateCheck(
@@ -20,9 +28,22 @@ export async function dispatchRevalidation(
     request,
   );
   const prefix = `/repos/${encodeURIComponent(repository.owner)}/${encodeURIComponent(repository.repo)}`;
-  const workflow = await request(`${prefix}/actions/workflows/agentproof-analyze.yml`);
+  const [workflow, trustedWorkflowSha] = await Promise.all([
+    request(`${prefix}/actions/workflows/agentproof-analyze.yml`),
+    resolveTrustedWorkflowRevision(
+      {
+        repository: repositoryData,
+        expectedSha: assertSha(workflowSha, "controller workflow SHA"),
+      },
+      request,
+    ),
+  ]);
 
   async function dispatch(file, inputs) {
+    await resolveTrustedWorkflowRevision(
+      { repository: repositoryData, expectedSha: trustedWorkflowSha },
+      request,
+    );
     // API 2026-03-10 always returns native run details; never guess from a run list.
     const response = await request(`${prefix}/actions/workflows/${file}/dispatches`, {
       method: "POST",
@@ -58,9 +79,10 @@ export async function dispatchRevalidation(
       repository: repositoryData,
       expectedRunId: analysisRunId,
       expectedRunAttempt: 1,
+      expectedWorkflowSha: trustedWorkflowSha,
     });
-    if (!isControllerAnalysis(run) || assertSha(run.head_sha) !== identity.baseSha) {
-      throw new Error("Analysis dispatch did not use the expected trusted base and controller");
+    if (!isControllerAnalysis(run)) {
+      throw new Error("Analysis dispatch did not use the expected controller");
     }
     if (now() >= deadline) {
       throw new Error(`Analysis run ${analysisRunId} exceeded the bounded revalidation wait`);
@@ -93,6 +115,7 @@ export async function dispatchRevalidation(
     artifacts: artifactPage.artifacts,
     expectedRunId: analysisRunId,
     expectedRunAttempt: 1,
+    expectedWorkflowSha: trustedWorkflowSha,
   });
   if (validated.pullRequestNumber !== identity.number || validated.headSha !== identity.headSha) {
     throw new Error("Analysis artifact does not match the dispatched pull request head");

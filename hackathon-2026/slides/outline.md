@@ -4,9 +4,10 @@
 Trustworthy](https://innovation-studio.microsoft.com/events/hackathon2026/challenges/executive-challenges)
 
 **Submission thesis:** AgentProof supplies commit-bound evidence and explicit
-human decisions. Public main now has verified active no-bypass protections;
-independent code-owner onboarding and the candidate workflow repair's human
-rollout remain pending. A draft-disabled Merge button is not a check/review
+human decisions. Public main has verified active no-bypass protections and both
+code owners. PR #10 automatic refresh is verified, but the batch failed for
+old-base PR #5/#6; the follow-up repair's human rollout remains pending.
+A draft-disabled Merge button is not a check/review
 test. Keep historical slides labeled illustrative and use current native
 records for enforcement claims.
 

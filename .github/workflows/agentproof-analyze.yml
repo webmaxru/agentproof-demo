@@ -1,7 +1,7 @@
 name: AgentProof Analysis
 
 on:
-  # pull_request_target keeps this workflow definition on the protected base.
+  # pull_request_target keeps this workflow definition on the protected default branch.
   # The job grants no write scope or secrets and checks out the head only as data.
   pull_request_target:
     types:
@@ -44,13 +44,13 @@ jobs:
       - name: Check out trusted workflow bootstrap
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          ref: ${{ github.workflow_sha }}
           path: bootstrap
           persist-credentials: false
 
       - name: Verify workflow bootstrap revision
         env:
-          EXPECTED_BOOTSTRAP_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+          EXPECTED_BOOTSTRAP_SHA: ${{ github.workflow_sha }}
         run: test "$(git -C bootstrap rev-parse HEAD)" = "$EXPECTED_BOOTSTRAP_SHA"
 
       - name: Resolve pull request

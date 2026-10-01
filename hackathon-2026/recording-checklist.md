@@ -10,6 +10,10 @@ video or sharing the draft.
 - [ ] Red `AgentProof / gate` is complete before reviewer sessions begin.
 - [ ] Final/raw evidence links match the repository, PR number, policy, and
       current head SHA.
+- [ ] The capture helper uses a clean current protected workflow checkout;
+      its orchestration SHA is recorded separately from the immutable PR/policy base.
+- [ ] Old-base repair is human-deployed and the formerly failed PR #5/#6 paths
+      have completed native publication; PR #10 success alone is not full batch success.
 - [ ] Test, Security, and Policy reviewer results are isolated and read-only.
 - [ ] Evidence Board authority banner is visible.
 - [ ] Exception is eligible, specific, authorized, expiring, and current-SHA.

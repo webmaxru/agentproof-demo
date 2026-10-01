@@ -17,13 +17,33 @@ OS-temporary staging, provider ownership, and root/nested runtime regressions.
 This implementation keeps its expense-specific policy/AP-ID together. It does
 not merge or approve the upstream PR.
 
-The candidate automatic-refresh repair imports source commit
+The original automatic-refresh repair imported source commit
 `8b7f5c5de64a66c24a4d24e928355130757e38f0`, plus the native Publisher-validator
 extraction from `95f68dc2e5284348cbb24b7d8391946aa9305b96`. Source workflow
 templates were mapped to this application's active `.github/workflows`.
-This is a reviewable PR #4 change, not a deployment to protected `main`.
-Analysis isolation, application-specific AP-ID, policy, thresholds, action
-pins, and dependency manifests remain unchanged.
+That repair landed through reference PR #4 at protected main
+`28f185f710848cf20a2c4c047f5499583c7fdcb2`. PR #10's native metadata refresh
+succeeded, but the subsequent batch failed for older-base PR #5/#6; see the
+separate step 5/step 6 receipts in [GitHub setup](github-setup.md).
+
+The new old-base repair candidate imports immutable source commit
+`a7bd2c29cbe77f4930ee216296205dda110766a6`
+([webmaxru/AgentProof#4](https://github.com/webmaxru/AgentProof/pull/4)).
+Its consumer runtime patch SHA-256 is
+`c4d1e4269981d6ad11a975044223b41c56d7945b20fa03f0681a2fd631bd80d6`.
+Six shared scripts and four workflow templates are mapped to the active
+consumer paths; shared workflow/CLI regressions come from the same commit.
+The reference keeps `APPLICATION_PATH = "."`, its presenter regressions, and
+its expense-specific policy/AP-ID. Analysis isolation, policy thresholds,
+action pins, both CODEOWNERS, runtime dependencies, and protections are unchanged.
+
+This follow-up separates the independently verified current protected workflow
+revision from the immutable PR policy/evidence base. Current bootstrap
+publication validators cannot be replaced by older policy-base publication
+scripts. The presenter uses those current native-only validators, but fetches
+the subject's policy at its real base. Candidate tests and native CI are not
+deployment evidence: human review/rollout and native unchanged-old-base
+publication remain required, and issue #7 stays open.
 
 ## Mapping
 
