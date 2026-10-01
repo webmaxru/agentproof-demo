@@ -33,6 +33,13 @@ human code owner still needs onboarding; the author cannot approve their own
 PR. All recording PRs remain draft, so a disabled Merge button is not itself
 proof of a required-check or review decision. See [the setup record](docs/github-setup.md).
 
+**Runtime audit update:** current advisories now block the installed Fastify
+5.12.1 dependency. PR #4 separately pins Fastify 5.12.5; its production audit
+has no high/critical findings and one allowed moderate finding. A human-authored
+CODEOWNERS onboarding PR must include that narrow reviewed dependency/lock fix
+so its required gate can pass. Frozen PR #6 and its earlier passing dependency
+receipt are historical, not current remediation proof.
+
 ## Run the application
 
 ```powershell

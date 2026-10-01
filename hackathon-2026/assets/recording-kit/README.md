@@ -97,7 +97,9 @@ the base and invalidate old captures. Keep unsafe/remediation heads frozen
 now. The later human-recorded remediation transition must incorporate the
 then-current protected main without dropping its controls, then resolve the
 resulting full head/base and collect fresh evidence. Prepared PR #6's old head
-is not automatically that new up-to-date head.
+is not automatically that new up-to-date head. Its Fastify 5.12.1 audit is now
+historical, not current passing remediation. Include the reviewed current
+runtime/lock fix (5.12.5 in PR #4) as well as the authorization-marker repair.
 
 Every successful capture gets a new ignored `.agentproof\recording` directory.
 The downloaded evidence and `presenter-state.json` are a private, read-only

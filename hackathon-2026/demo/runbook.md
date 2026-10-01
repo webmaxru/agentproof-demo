@@ -70,13 +70,30 @@ pending. Keep the frozen scenario heads/drafts unchanged; draft-disabled Merge
 is not a check-enforcement test. Do not narrate automatic refresh as repaired
 before a real default-branch run verifies it.
 
+The 2026-10-01 live audit now reports high advisories for the previously safe
+Fastify 5.12.1 resolution. PR #4's separate dependency fix pins 5.12.5 and
+passes the current production audit with one allowed moderate finding.
+Earlier safe/PR #6 audit receipts are historical: frozen PR #6's standalone
+head is **not a current passing dependency remediation**. Do not reuse its
+old five-pass/retention-unknown result as a fresh scan.
+
+An authorized human's CODEOWNERS onboarding PR on the vulnerable installed
+base must also include the narrow dependency/lock fix from PR #4, commit
+`f2d89fd432658753346e152a2f20cbdd030cf8ff`, so its required gate can pass.
+The existing owner can review that differently human-authored PR under the
+current base rules. Changing owners alone does not fix the audit; no guessed
+reviewer, exception, bypass, or agent merge substitutes for this process.
+
 The installed strict check rule requires an up-to-date branch. Later human
 CODEOWNERS onboarding and repair rollout will advance main, invalidating these
 old-base captures. Keep current PR #5/#6 heads frozen now. After the first
 recorded disposition, the human-recorded remediation transition must include
-the then-current protected main without losing its owners or controls; the
-prepared PR #6 head is not automatically the new PR #5 head. Resolve the
-resulting full SHA/base and collect fresh evidence before further decisions.
+the then-current protected main without losing its owners, controls, or
+reviewed dependency/lock fixes. Include the current patched dependency and
+the prepared authorization-marker restoration, while retaining incomplete
+retention. The prepared PR #6 head is not automatically the new PR #5 head.
+Resolve the resulting full SHA/base and collect fresh evidence before further
+decisions.
 
 The human operator must mark setup PR #4 ready before requesting human review.
 After the protected-main rollout, mark recording PR #5 ready before relying on

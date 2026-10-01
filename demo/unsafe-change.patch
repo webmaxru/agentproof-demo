@@ -5,7 +5,7 @@ diff --git a/package.json b/package.json
      "agentproof": "node packages/evidence-cli/dist/cli.js"
    },
    "dependencies": {
--    "fastify": "5.12.1"
+-    "fastify": "5.12.5"
 +    "fastify": "5.8.4"
    },
    "devDependencies": {

@@ -8,10 +8,14 @@ assertions), and removes `deletionMethod`. Current npm audit results, not this
 patch or a fixture, determine the actual dependency finding.
 
 Keep the unsafe recording PR frozen at that head until the human captures its
-first eligible exception. Prepare a separate remediation branch from the
-unsafe head, restoring Fastify 5.12.1 and the marker while retaining incomplete
-retention. Regenerate the root lockfile and obtain fresh evidence for that SHA.
-Do not post exceptions, approve, merge, or release as an agent.
+first eligible exception. For the later authorized recording transition,
+restore the reviewed patched runtime (currently Fastify 5.12.5) and the marker
+while retaining incomplete retention. Incorporate the then-current reviewed
+main dependency/lock fix and controls, then obtain fresh evidence for the
+resulting full SHA. Existing prepared PR #6 stays frozen: its Fastify 5.12.1
+resolution is now affected by high advisories, so its older retention-only
+receipt is historical, not a current passing remediation. Do not post
+exceptions, approve, merge, or release as an agent.
 
 `synthetic-findings.json` is **PRECOMPUTED / NOT LIVE**, with app-root paths
 adapted for illustration. It is not a scan of either recording head.

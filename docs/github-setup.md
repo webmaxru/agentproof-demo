@@ -22,6 +22,7 @@ ruleset, without changing `main` or granting another collaborator access.
 | Actions                      | Same four selected full-SHA pins; default token `read`; automated review approval and broad GitHub-owned/verified allowances remain disabled                  |
 | Independent human/code owner | **NOT ONBOARDED**; only verified owner `@webmaxru` is named, and cannot approve their own PR                                                                  |
 | Workflow repair              | **CANDIDATE IN PR #4**, not installed on the unchanged protected base                                                                                         |
+| Runtime dependency           | Installed Fastify `5.12.1` now has high advisories; PR #4's separate `5.12.5` patch passes the current production audit                                       |
 
 Read-only commands used for the current state, after the authentication
 preamble below:
@@ -46,6 +47,15 @@ their own PR, and candidate CODEOWNERS edits do not retroactively alter the
 base's owner requirements. Human onboarding, independent review, and the
 protected-main rollout are prerequisites, not steps this agent bypasses.
 
+To avoid an onboarding deadlock, a **human-authored** CODEOWNERS onboarding PR
+based on the vulnerable installed base must also include the narrow two-file
+dependency fix from PR #4, commit
+`f2d89fd432658753346e152a2f20cbdd030cf8ff`. That permits fresh dependency
+evidence to meet the unchanged policy; the existing owner can independently
+review the differently authored PR under the base CODEOWNERS rules. An owner
+change alone does not repair the audit. Do not weaken checks, use an exception
+for this non-exceptionable finding, or substitute an automated author/reviewer.
+
 The operator must mark setup PR #4 **ready for review** before requesting its
 human review. On the still-installed baseline, use the verified owner-origin
 refresh if that metadata change leaves the gate pending; marking ready does
@@ -54,6 +64,51 @@ also mark recording PR #5 ready before relying on independent-approval or
 merge-availability shots. Ready-for-review preserves its head but triggers
 revalidation: wait for the repaired fresh check/artifact. No ready transition,
 approval, merge, or frozen recording-head change is performed by this setup.
+
+## Current runtime audit and narrow remediation
+
+The post-freeze check on intermediate setup head
+`f6df4419436d44168ef4aac574ac08388eb1c7f2` found genuine advisory drift:
+Fastify `5.12.1`, which passed the earlier recorded audit, now has high
+advisories including `GHSA-667r-xxjv-c9mm`, `GHSA-p68q-wchp-6fh7`,
+`GHSA-hwr6-493r-vm6h`, and `GHSA-9q9j-q6p8-xq58`. It is not a collector
+failure or an acceptable exception. Historical safe/remediation receipts below
+must not be reused as current dependency evidence.
+
+| Intermediate-head receipt                                                                     | Verified result                                                                                                          |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| [CI 36835617187](https://github.com/webmaxru/agentproof-demo/actions/runs/36835617187)        | `npm run check` passed 112 tests: 36 workflow, 7 app, 33 CLI, and 36 core                                                |
+| [Analysis 36835615798](https://github.com/webmaxru/agentproof-demo/actions/runs/36835615798)  | Success on the installed protected base                                                                                  |
+| [Publisher 36835662399](https://github.com/webmaxru/agentproof-demo/actions/runs/36835662399) | Only the final intentional blocking-status step failed                                                                   |
+| Native gate / artifact                                                                        | Check `110282525391`, artifact `11148892730`; 5 pass, 1 fail, no unknown or exception; unresolved `AP-SEC-NPM-AUDIT-001` |
+| Canonical evidence SHA-256                                                                    | `ee86e29f2009b30b7a2dc3aa558105e4200405c4334a339955ef5da9aaba1797`                                                       |
+| GitHub archive digest                                                                         | `sha256:19a4b0ede87e8235d725b2e48d83b9ff27607928e4e207b0e6826fec9420a759`                                                |
+
+The canonical verifier checked that artifact against its full head, installed
+base `ce9f1b8e33a7bd58ab1b2eb40149070a356fd083`, protected policy digest, and
+frozen PR body. These are historical intermediate-head receipts, not the final
+patched head's results.
+
+The separate dependency commit `f2d89fd432658753346e152a2f20cbdd030cf8ff`
+changes only the exact root Fastify pin and its lockfile resolution/integrity,
+from `5.12.1` to `5.12.5`. No unrelated package resolution, policy threshold,
+application source, or test assertion is changed.
+
+| Exact command                                                                                      | Result                                                                             |
+| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `npm audit --ignore-scripts --omit=dev --audit-level=high --json` before the patch                 | Exit 1; one high and one moderate affected production dependency                   |
+| `npm pkg set dependencies.fastify=5.12.5` then `npm install --ignore-scripts --no-audit --no-fund` | Completed; only `package.json` and the root Fastify lockfile entries changed       |
+| `npm audit --ignore-scripts --omit=dev --audit-level=high --json` after the patch                  | Exit 0; no high/critical findings, one allowed moderate `fast-uri` finding         |
+| `npm run typecheck`                                                                                | Passed for the app and both workspaces                                             |
+| `npm run build:app`                                                                                | Passed                                                                             |
+| `npm run test:coverage`                                                                            | All 7 app tests passed; 93.75% lines/statements, 97.05% branches, 88.88% functions |
+| `npm ls fastify --all`                                                                             | Only the active root `fastify@5.12.5` resolution                                   |
+
+This patch is reviewable, not installed on main. The next frozen PR #4 head
+requires its own native CI, Analysis, Publisher, and current audit evidence;
+the final receipt belongs on issue #2. Frozen PR #6 still declares `5.12.1`:
+its earlier retention-only blocking result is historical, and its standalone
+head is not a current passing dependency remediation.
 
 ## Historical initial state: 2026-09-30
 
@@ -301,7 +356,7 @@ freeze, without a self-referential source-commit loop.
 
 Local mocked regression tests and PR CI validate the candidate only.
 PR-triggered trusted Analysis/Publish still run the installed base revision;
-their green result must not be presented as execution of the candidate
+any green result must not be presented as execution of the candidate
 privileged workflow. Do not execute PR workflow code with a write token,
 update `main`, merge, or simulate a human exception to bypass rollout.
 
@@ -317,10 +372,12 @@ Candidate local checks completed in this reference checkout:
 | `git diff --check`                                                                                                           | Passed                                                                                                                                        |
 
 Changed Markdown/MJS/YAML/JSON files also passed the installed Prettier check.
-Scope comparison confirms no app, tests, retention declaration, engine/CLI,
-policy, dependency-manifest, action-pin, Analysis-isolation, CI-definition, or
-ruleset-definition changes. Final committed-blob and CI receipts belong in the
-coordinator's issue #2 comment after the candidate and PR body are frozen.
+Scope comparison confirms no application source/tests, retention declaration,
+engine/CLI, policy, action-pin, Analysis-isolation, CI-definition, or
+ruleset-definition changes. The separately reviewed root dependency-manifest
+and lockfile patch is documented above. Final committed-blob and CI receipts
+belong in the coordinator's issue #2 comment after the candidate and PR body
+are frozen.
 
 Keep issue #7 open until authorized human onboarding/review and protected-main
 deployment are complete, then observe the actual default-branch bot Analysis
@@ -333,11 +390,13 @@ main. Human CODEOWNERS onboarding and repair merges will change that base.
 Do not advance frozen PR #5/#6 now or update the unsafe PR before its first
 recorded human disposition. During the later authorized recorded transition,
 incorporate the then-current protected main while preserving its owners,
-controls, and workflows. Prepared remediation head
+controls, workflows, and reviewed runtime dependency/lock fixes. Prepared remediation head
 `830d2589cee7ab9b2db4b3afa1c93f25ca2b6c73` is not automatically the final
-up-to-date unsafe-PR head. Resolve the actual resulting full base/head and
-collect new evidence; neither old-base artifacts nor previous review count
-as proof for that revision.
+up-to-date unsafe-PR head, and its Fastify `5.12.1` resolution is now affected.
+The later recorded head must include the current reviewed dependency patch
+as well as the prepared authorization-marker restoration. Resolve the actual
+resulting full base/head and collect new evidence; neither old-base artifacts
+nor previous review count as proof for that revision.
 
 ## 5. Verify policy integrity
 

@@ -168,7 +168,10 @@ procedure is the operational version:
    to incorporate the then-current protected main, preserving its reviewed
    controls/workflows and onboarded owners. Do not advance the current unsafe
    head before its first recorded human disposition. The prepared separate
-   PR #6 head is not automatically the final up-to-date PR #5 head.
+   PR #6 head is not automatically the final up-to-date PR #5 head. Its old
+   Fastify 5.12.1 audit is now historical, not current passing remediation:
+   include the reviewed current runtime/lock fix (5.12.5 in PR #4) as well as
+   the prepared authorization-marker restoration.
 4. Return to the pull request and wait for the new head SHA to appear.
    Resolve its actual full base/head again and collect new evidence; main
    advances from human onboarding/repair rollout invalidate old-base captures,
