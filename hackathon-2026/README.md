@@ -9,11 +9,14 @@ This migrated packet is in the **public** app-first reference repository
 `webmaxru/agentproof-demo`. Its original event framing and historical trials
 are not new live evidence. Consult [actual GitHub setup](../docs/github-setup.md)
 before using copy-ready claims: public main now has a verified active no-bypass
-ruleset and both code owners. PR #4 is merged and PR #10's metadata refresh is
-verified, but the batch failed before publication for old-base PR #5/#6.
-The follow-up old-base repair remains a candidate requiring human rollout.
-Human exceptions/review and final privacy sign-off are still prerequisites.
-The scenario/smoke PRs remain draft;
+ruleset and both code owners. PR #4 and old-base repair PR #11 are installed
+on `66058035adc0ca613f4d1fa5db6afc606327b7c0`; native metadata/manual-batch
+publication is verified and issue #7 is closed. The genuine scheduled run
+overlapped manual work, not an uninterrupted scheduler-only demonstration.
+Use [the current subjects](../demo/README.md): unsafe PR #5 and separate
+retention-only successor PR #12; PR #6 is historical.
+Human exceptions, same-PR invalidation, independent review, and final privacy
+sign-off are still prerequisites. The scenario/smoke PRs remain draft;
 neither a red/green check nor draft-disabled Merge alone proves the review flow.
 
 ## Contents

@@ -62,51 +62,49 @@ operations, the runtime still reported `functions.apply_patch`,
 narrate three personal reviewer automations; the working sequence uses three
 isolated, manually started, read-only sessions.
 
-See [current GitHub setup](../../docs/github-setup.md) for this repository's
-actual runs and installed-versus-candidate state. Public main now has a
-verified active no-bypass ruleset and both code owners; PR #4 is merged.
-Rollout step 5 verified PR #10's actual metadata controller -> bot Analysis ->
-explicit Publisher. Step 6's batch succeeded for PR #10 but failed for frozen
-old-base PR #5/#6 before Publisher dispatch. The follow-up old-base repair
-still needs human review/rollout and native verification of those failed jobs.
-Keep the frozen scenario heads/drafts unchanged; draft-disabled Merge is not
-a check-enforcement test. Do not narrate a successful whole batch or deployed
-old-base repair from PR #10's successful path.
+## Current reference-repository preflight
 
-The 2026-10-01 live audit now reports high advisories for the previously safe
-Fastify 5.12.1 resolution. PR #4's separate dependency fix pins 5.12.5 and
-passes the current production audit with one allowed moderate finding.
-Earlier safe/PR #6 audit receipts are historical: frozen PR #6's standalone
-head is **not a current passing dependency remediation**. Do not reuse its
-old five-pass/retention-unknown result as a fresh scan.
+The [dated setup record](../../docs/github-setup.md) confirms installed
+PR #4 and old-base repair PR #11 on protected main
+`66058035adc0ca613f4d1fa5db6afc606327b7c0`, active no-bypass rules, and both
+code owners. Native metadata and manual-batch publication are verified,
+including unchanged old-base subjects; issue #7 is closed. The earlier
+partial batch failure is history, not the current rollout state.
+The SHA above is a dated rollout anchor. Each take must independently resolve
+the live protected default-branch tip after any later merge, not pin that anchor.
 
-The narrow dependency/lock fix from PR #4, commit
-`f2d89fd432658753346e152a2f20cbdd030cf8ff`, and both CODEOWNERS are now installed.
-Preserve them. The agent cannot substitute a guessed reviewer, exception,
-bypass, or merge for independent human review of the follow-up repair.
+The genuine 13:23 UTC scheduled run overlapped a manual batch that superseded
+two Publishers. Do not claim an uninterrupted scheduler-only demonstration or
+guaranteed six-hour delivery. That exercise and the actual human lifecycle
+remain separate from the repaired publication path.
 
-The installed strict check rule requires an up-to-date branch. Later human
-repair rollout will advance main. The presenter helper must then use that clean
-protected workflow revision and independently fetch the immutable PR-base policy;
-main advancement does not itself update these PR heads/bases. Keep PR #5/#6
-heads frozen now. After the first
-recorded disposition, the human-recorded remediation transition must include
-the then-current protected main without losing its owners, controls, or
-reviewed dependency/lock fixes. Include the current patched dependency and
-the prepared authorization-marker restoration, while retaining incomplete
-retention. The prepared PR #6 head is not automatically the new PR #5 head.
-Resolve the resulting full SHA/base and collect fresh evidence before further
-decisions.
+Use frozen unsafe PR #5 and the current separate retention-only draft
+[PR #12](https://github.com/webmaxru/agentproof-demo/pull/12), with exact full
+heads in [the scenario guide](../../demo/README.md).
+PR #6 is historical: its Fastify 5.12.1 resolution no longer supplies current
+passing dependency proof. PR #12 starts from protected main, retains Fastify
+5.12.5 and the authorization marker, and removes only `deletionMethod`.
+Resolve fresh native evidence before recording; a dated audit is not a
+permanent promise about advisories.
 
-Setup PR #4 is already merged. After the new repair's human-controlled
-protected-main rollout and native old-base verification, mark PR #5 ready before relying on
-independent approval or merge-availability UI. This does not advance its head,
-but it triggers revalidation; wait for the repaired current-head check. These
-are later operator steps, not agent changes to the current drafts.
+The presenter helper must use the clean current protected workflow revision
+and independently fetch the immutable PR-base policy. A main update does not
+itself advance a frozen PR's head/base. Keep PR #5/#6 unchanged now.
+After the first recorded human disposition, the actual same-PR remediation
+transition must incorporate the then-current protected main, preserving both
+owners, controls, and reviewed dependency/lock fixes. PR #12 is a separate
+prepared comparison, not automatically the new PR #5 head or proof of
+stale-decision invalidation. Resolve the resulting full head/base and collect
+new evidence before further decisions.
+
+For later review shots, a human must ready the recording PR and wait for its
+new current-head check. Draft-disabled Merge is not an enforcement test.
+Readiness, dispositions, independent approval, and final privacy review are
+operator steps; none has been performed by preparing the successor or media.
 
 ## T-24 hours
 
-1. Run `npm ci` and `npm run check`.
+1. Run `npm ci --ignore-scripts` and `npm run check`.
 2. Verify the selected vulnerable dependency still produces the expected real
    normalized advisory; if advisory service behavior changed, repair the demo
    before recording rather than relabel a fixture as live.

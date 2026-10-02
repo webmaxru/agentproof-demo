@@ -26,19 +26,26 @@ ruleset `24293848` protects `main`, requiring both `AgentProof / gate` and
 stale-review dismissal, and resolved conversations. Native branch/rule reads
 confirm enforcement; the earlier private-plan HTTP 403 is historical.
 
-**Rollout boundary:** the automatic-refresh repair in setup PR #4 is a
-candidate, not installed on protected `main`. Issue #7 stays open until the
-real default-branch bot handoff publishes successfully. A distinct authorized
-human code owner still needs onboarding; the author cannot approve their own
-PR. All recording PRs remain draft, so a disabled Merge button is not itself
-proof of a required-check or review decision. See [the setup record](docs/github-setup.md).
+**Installed rollout:** PR #4 and the old-base repair in PR #11 are merged.
+The dated 2026-10-01 rollout anchor is
+`66058035adc0ca613f4d1fa5db6afc606327b7c0`; both `@webmaxru`
+and `@vibeprogrammer` are code owners. Native metadata and manual-batch paths
+published evidence for the unchanged subjects, and issue #7 is closed.
+The genuine 13:23 UTC scheduled run overlapped manual work; an uninterrupted
+scheduler-only demonstration and the human decision/review lifecycle remain
+separate recording work. Resolve the live protected default-branch SHA before
+each capture; later merges advance it beyond this receipt. Cron is not a guaranteed delivery interval.
+See [the dated setup record](docs/github-setup.md).
 
-**Runtime audit update:** current advisories now block the installed Fastify
-5.12.1 dependency. PR #4 separately pins Fastify 5.12.5; its production audit
-has no high/critical findings and one allowed moderate finding. A human-authored
-CODEOWNERS onboarding PR must include that narrow reviewed dependency/lock fix
-so its required gate can pass. Frozen PR #6 and its earlier passing dependency
-receipt are historical, not current remediation proof.
+**Current demo subjects:** use frozen unsafe PR #5 and the separate
+retention-only successor [PR #12](https://github.com/webmaxru/agentproof-demo/pull/12).
+PR #12 starts from protected main, retains Fastify 5.12.5 and the authorization
+marker, and removes only `deletionMethod`. PR #6 and its older passing
+dependency receipt are historical, not current remediation proof.
+[The scenario guide](demo/README.md) records the full heads and fresh-capture
+requirements. A separate successor is not a same-PR stale-decision rehearsal.
+All recording subjects remain draft; no exception, independent approval, or
+merge availability is implied.
 
 ## Run the application
 
@@ -176,9 +183,9 @@ owners.
 
 1. Push the safe default branch and keep Actions disabled until every workflow
    and action pin has been reviewed.
-2. Confirm `.github/CODEOWNERS` names authorized humans. The verified owner is
-   `@webmaxru`; a separate authorized code owner/reviewer is a human prerequisite,
-   not a placeholder identity or an agent approval.
+2. Confirm `.github/CODEOWNERS` names authorized humans. Both `@webmaxru`
+   and `@vibeprogrammer` are installed code owners; an actual independent
+   scenario review is still required, not supplied by a listed identity.
 3. Review `policy/release-policy.yml`; a PR is evaluated against protected base
    policy rather than policy weakened by that same PR.
 4. Enable the workflows and open a harmless PR once so the
@@ -200,8 +207,8 @@ owners.
    more.
 
 This reference's ruleset is now installed and verified through native APIs.
-That does not supply the missing human reviewer or deploy unmerged workflow
-changes. Exact instructions, rollout prerequisites, and acceptance tests are in
+That does not supply a scenario's independent human approval or automatically
+deploy future workflow changes. Exact instructions, dated rollout receipts, and acceptance tests are in
 [GitHub setup](docs/github-setup.md).
 
 ## Copilot App reviewer setup
@@ -210,10 +217,10 @@ The working MVP uses manually started reviewer sessions; it does not depend on
 personal PR automations. Install the separately maintained kit from its current
 marketplace:
 
-Before using upstream `main`, an authorized human must merge the separately
-reviewed kit-migration PR and confirm its marketplace points to
-`webmaxru/AgentProof`. This repository does not merge that PR or claim that an
-older installed plugin validates the migrated kit.
+Before using upstream `main`, confirm the reviewed marketplace points to
+`webmaxru/AgentProof` and validate the installed kit revision. This repository
+does not deploy that kit or claim that an older installed plugin validates the
+current marketplace.
 
 ```text
 copilot plugin marketplace add webmaxru/AgentProof
@@ -321,8 +328,10 @@ git push -u origin demo/unsafe-change
 Open a draft PR and set the origin declaration to `self-declared` with declared
 tool `GitHub Copilot` only when that accurately describes the work. The prepared
 recording branches use that declaration, not inferred authorship. Keep the
-unsafe recording PR unchanged until the human captures its first exception;
-prepare remediation on a separate branch from that head. The patch is
+unsafe recording PR unchanged until the human captures its first exception.
+Use the [separate current successor](demo/README.md) for prepared comparison;
+do not relabel historical PR #6 or substitute another PR for the later
+human-recorded same-PR transition. The patch is
 intentionally unsafe: never merge it to a
 real application branch. It pins a vulnerable runtime dependency, removes the
 stable evidence marker from the existing non-approver behavioral test, and

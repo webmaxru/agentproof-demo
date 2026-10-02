@@ -23,6 +23,29 @@ GitHub approval, immutable canvas record, or current compliance result.
 Do not create plausible-looking GitHub checks, comments, reviews, session links,
 artifact digests, or SHAs that never existed.
 
+## Synthetic fixture integrity
+
+The fixture deliberately identifies `agentproof/synthetic-demo`, an all-zero
+base SHA, an all-one head SHA, and no workflow run. Its historical timestamp,
+synthetic generator/origin labels, two failures, and one retention unknown are
+illustrative, not observations of the current repository or advisory database.
+An internally valid canonical digest does not establish live provenance.
+
+The normal `npm test` / `npm run check` pipeline verifies the committed fixture's
+schema, canonical digest, synthetic identity, and blocking finding states. For
+a focused check, run this from the repository root:
+
+```powershell
+npm run test --workspace @agentproof/evidence-core -- tests/schema-policy.test.ts
+```
+
+After an intentional fixture edit, use `parseEvidenceDocument`,
+`withArtifactDigest`, and then `parseAndVerifyEvidence`, exported by
+`packages/evidence-core/src/index.ts`. The digest implementation in
+`src/artifact.ts` is authoritative. Do not hash raw file bytes,
+bypass verification, refresh the illustrative timestamp, or attach a real
+repository/PR/workflow identity to this synthetic fixture.
+
 ## Capture manifest
 
 For each fallback file added here, record:

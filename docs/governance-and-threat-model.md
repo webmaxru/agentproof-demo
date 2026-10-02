@@ -30,7 +30,7 @@
 | Forged, replayed, or wrong artifact                             | Validate source workflow/repository/run, schema, PR, base/head SHA, artifact names/digests, and live head                    | GitHub/service compromise is outside the prototype; fail closed on any ambiguity.                                                                                       |
 | Old run overwrites a new result                                 | Per-PR concurrency, live-head resolution before publish, SHA-bound check/artifact                                            | Race defects are possible; acceptance tests must force overlapping updates.                                                                                             |
 | Unauthorized or vague exception                                 | Exact PR-comment grammar, repository-permission check, eligibility, rationale/expiry bounds, comment digest, current SHA     | Authorized users can still make poor decisions; require independent approval and periodic review.                                                                       |
-| Accepted exception is edited, deleted, expires, or head changes | Comment event revalidation, scheduled/manual revalidation, stale-SHA rejection                                               | Schedule delay creates a bounded validity window; set it to organizational risk tolerance.                                                                              |
+| Accepted exception is edited, deleted, expires, or head changes | Comment event revalidation, scheduled/manual revalidation, stale-SHA rejection                                               | Delayed schedules can leave old checks visible. Revalidate current state before decisions; cron is not a delivery-time guarantee.                                       |
 | Reviewer agent invents a pass or mixes SHAs                     | Deterministic gate is authoritative; prompts require same-SHA evidence and `unknown` on gaps; assembler rejects mixed inputs | Prose may still be wrong. Humans follow evidence links and GitHub check, not the summary alone.                                                                         |
 | Canvas is mistaken for audit evidence                           | Persistent banner and documentation: mutable operational view only                                                           | Screenshots can mislead; label fallback media and show GitHub authoritative records.                                                                                    |
 | Claimed model provenance is false                               | Only `github-attributed`, `self-declared`, or `unknown`; provenance does not affect verified gate facts                      | Universal authorship detection is unsolved and explicitly not claimed.                                                                                                  |
@@ -54,7 +54,7 @@ setup/product-feedback templates, not evidence of deployed controls.
 - **Publisher:** artifact/content read plus only the check/PR-summary write scopes
   required to publish validated results; it never runs PR code.
 - **Disposition/revalidation:** read current PR/comment state and dispatch trusted
-  analysis; the candidate repair also dispatches Publisher after exact-run
+  analysis and explicitly dispatch Publisher after exact-run
   validation using the same existing actions-write scope. It never waits for
   Publisher while holding its gate lock or approves exceptions itself.
 - **Manual App reviewers:** repository, PR, check, and artifact read only.
@@ -76,11 +76,19 @@ It does not equal PR approval. A different reviewer evaluates the code and the
 repository ruleset requires both independent approval and a green gate.
 
 On 2026-10-01 this public reference's no-bypass ruleset and effective main
-branch rules were verified. No distinct human code owner has been onboarded.
+branch rules were verified, both code owners are installed, and PR #4/PR #11
+are merged on protected main `66058035adc0ca613f4d1fa5db6afc606327b7c0`.
+Native metadata/manual-batch publication is verified and issue #7 is closed.
+The genuine scheduled run overlapped manual replacement Publishers; this is
+not an uninterrupted scheduler-only demonstration or proof of the human
+comment/edit/delete/expiry lifecycle.
+
 All scenario PRs remain draft, so draft-disabled Merge is not a review or
-required-check test. The candidate refresh repair is unmerged; automatic
-comment/scheduled publication remains unverified until protected-base rollout
-and a genuine native end-to-end run. Issue #7 stays open in the meantime.
+required-check test. The current separate successor PR #12 replaces PR #6
+only as a prepared comparison, not as evidence of same-PR stale decisions.
+Historical heads/receipts remain intact. Scenario exceptions, independent
+approval, stale-approval dismissal, and final recording remain human work;
+the unsafe reviewer-tool boundary has not been repaired.
 
 Emergency bypass, if the organization permits one, must be a separately
 authorized break-glass process with reason, time, actor, incident/reference,

@@ -12,8 +12,15 @@ video or sharing the draft.
       current head SHA.
 - [ ] The capture helper uses a clean current protected workflow checkout;
       its orchestration SHA is recorded separately from the immutable PR/policy base.
-- [ ] Old-base repair is human-deployed and the formerly failed PR #5/#6 paths
-      have completed native publication; PR #10 success alone is not full batch success.
+- [ ] Installed PR #11 and native old-base publication receipts are checked;
+      historical candidate/batch failures are not narrated as current state.
+- [ ] Prepared subjects match the scenario guide: unsafe PR #5, current
+      retention-only successor PR #12, and PR #6 explicitly historical.
+- [ ] The newest completed check/artifact is resolved for the actual full head;
+      no dated digest or old dependency pass is treated as permanently current.
+- [ ] A separate prepared successor is not presented as a same-PR human lifecycle.
+- [ ] Scheduler-only claims have an uninterrupted native receipt; the overlapped
+      13:23 UTC run and a configured cron interval are not that proof.
 - [ ] Test, Security, and Policy reviewer results are isolated and read-only.
 - [ ] Evidence Board authority banner is visible.
 - [ ] Exception is eligible, specific, authorized, expiring, and current-SHA.
