@@ -1,7 +1,6 @@
 schemaVersion: 1.0.0
 classification: synthetic
 retentionDays: 7
-deletionMethod: process-memory-release
 owner: agentproof-sample-maintainers
 dataCategories:
   - synthetic-employee-identifiers
