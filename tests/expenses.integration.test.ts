@@ -75,7 +75,7 @@ describe("synthetic expense approval API", () => {
     expect(response.json<{ error: string }>()).toMatchObject({ error: "actor_required" });
   });
 
-  it("denies approval to a caller outside the approver allow-list", async () => {
+  it("[AP-ID:expense-approval.authorization.non-approver-denied] denies approval to a caller outside the approver allow-list", async () => {
     await app.inject({ method: "POST", url: "/expenses", payload: SYNTHETIC_EXPENSE });
 
     const response = await app.inject({
